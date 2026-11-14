@@ -1,0 +1,61 @@
+# ==============================================================================
+# SAWM - Milestone 4 Predictive World Model (RSSM) Configuration
+# Hardware Target: RTX 3050 Ti 4GB VRAM / 16GB System RAM / Python 3.11
+# ==============================================================================
+
+model:
+  obs_dim: 49                    # State dimension (robot kinematics, objects, safety)
+  action_dim: 8                  # Commanded action (7 joints + 1 gripper)
+  encoder_hidden_dim: 128        # MLP encoder hidden width
+  deterministic_dim: 128         # Recurrent GRU hidden state dimension (h_t)
+  stochastic_dim: 32             # Stochastic Gaussian latent state dimension (s_t)
+  prior_hidden_dim: 128          # Transition prior MLP hidden width
+  posterior_hidden_dim: 128      # Representation posterior MLP hidden width
+  decoder_hidden_dim: 128        # Observation decoder MLP hidden width
+  min_std: 0.1                   # Minimum standard deviation for latent Gaussians
+  max_std: 10.0                  # Maximum standard deviation for latent Gaussians
+
+dataset:
+  data_dir: "data/trajectories"
+  train_episodes: 80             # Total training episodes
+  val_episodes: 20               # Total held-out validation episodes
+  sequence_length: 50            # Training sequence chunk length (0.5s at 100Hz)
+  batch_size: 32                 # Sequences per training batch
+  num_workers: 0                 # Windows multiprocessing compatibility
+  seed: 42
+
+training:
+  learning_rate: 0.0003          # AdamW learning rate
+  weight_decay: 0.0001           # AdamW weight decay
+  max_grad_norm: 100.0           # Gradient clipping threshold
+  epochs: 40                     # Maximum training epochs
+  kl_scale: 0.10                 # Overall KL loss penalty beta
+  kl_balance: 0.80               # KL balancing factor alpha (prior vs posterior)
+  free_nats: 1.0                 # Free bits / nats threshold for KL divergence
+  checkpoint_dir: "checkpoints"
+  checkpoint_name: "rssm_best.pt"
+  normalizer_name: "normalizer.pt"
+  device: "cuda"                 # "cuda" with automatic "cpu" fallback
+
+loss_weights:
+  robot_joints: 1.0              # Joint positions q
+  robot_velocities: 0.5          # Joint velocities q_dot
+  gripper_aperture: 1.0          # Finger separation
+  ee_position: 1.5               # End-effector Cartesian position
+  ee_orientation: 2.0            # End-effector quaternion geodesic error
+  object_position: 2.0           # Target cube position
+  object_orientation: 1.5        # Target cube orientation
+  object_velocity: 0.5           # Target cube velocity
+  goal_position: 1.0             # Goal marker position
+  obstacle_state: 1.5            # Static obstacle pose & active bit
+  proxy_state: 2.0               # Moving proxy pose & velocity
+  clearance_distance: 3.0        # Physical safety clearance d_min
+  zone_distance: 2.5             # Contextual zone distance d_zone
+  contact_flags: 2.0             # Binary BCE contact loss
+
+evaluation:
+  horizons: [1, 5, 10, 20, 50]   # Evaluation step horizons
+  val_subsets:
+    - "nominal"                  # Clear workspace baseline episodes
+    - "static_obstacle"          # Pillar hazard proximity episodes
+    - "moving_proxy"             # Dynamic encroaching proxy episodes

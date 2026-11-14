@@ -9,12 +9,39 @@ A research-oriented prototype investigating safety-aware predictive world modeli
 - **Milestone 0 (Audit & Research):** ✅ Complete
 - **Milestone 1 (Minimal Robot Simulation):** ✅ Complete
 - **Milestone 2 (Hazard & Safety Scenarios):** ✅ Complete
-- **Milestone 3 (Baseline Task Planner):** ✅ **Complete & Verified**
-- **Milestone 4 (Predictive World Model):** ⏳ Next
-- **Milestone 5 (Safety Modules):** ⏳ Pending
+- **Milestone 3 (Baseline Task Planner):** ✅ Complete
+- **Milestone 4 (Predictive World Model):** ✅ **Complete & Verified**
+- **Milestone 5 (Safety Modules):** ⏳ Next
 - **Milestone 6 (Counterfactual Safety Planning):** ⏳ Pending
 - **Milestone 7 (Interactive Dashboard):** ⏳ Pending
 - **Milestone 8 (Final Validation & Comparative Metrics):** ⏳ Pending
+
+---
+
+## Milestone 4: Predictive World Model (RSSM) (COMPLETED)
+
+### Overview
+Milestone 4 implements a lightweight Recurrent State-Space Model (RSSM) in PyTorch, establishing the predictive dynamics engine for the Franka Panda robot and its workstation:
+- **Latent Dynamics Decomposition:** Decomposes latent state into deterministic recurrent history ($h_t \in \mathbb{R}^{128}$) via GRUCell and stochastic state ($s_t \in \mathbb{R}^{32}$) via diagonal Gaussian representation.
+- **Exact Parameter Sizing (199,089 weights, 0.796 MB):**
+  - Encoder ($49 \rightarrow 128 \rightarrow 128$): $23,424$ parameters
+  - GRUCell ($W_{ih}: 384 \times 40, W_{hh}: 384 \times 128$): $65,280$ parameters
+  - Posterior Estimator ($256 \rightarrow 128 \rightarrow 64$): $41,408$ parameters
+  - Prior Predictor ($128 \rightarrow 128 \rightarrow 64$): $25,024$ parameters
+  - Decoder ($160 \rightarrow 128 \rightarrow 128 \rightarrow 49$): $43,953$ parameters
+- **Quaternion Canonicalization & Geodesic Loss:** Enforces sign invariance ($w \ge 0$), unit-sphere normalization, and geodesic orientation error in radians, preventing antipodal sign flips ($q$ vs $-q$).
+- **Multi-Horizon Open-Loop Imagination:** Evaluated across horizons $H \in \{1, 5, 10, 20, 50\}$ ($0.01\,\text{s}$ to $0.50\,\text{s}$) conditioned purely on action sequences.
+- **Strict Dataset Integrity:** 100 complete episodes (80 train, 20 val) partitioned by trajectory with zero cross-contamination and causal alignment $(x_t, a_t, x_{t+1})$. Feature-wise normalization computed strictly on train episodes.
+
+### Multi-Horizon Evaluation Results (Held-Out Validation)
+
+| Horizon $H$ | Sim Time | Norm RMSE | Joints (rad) | EE Pos (mm) | EE Rot (deg) | Object Pos (mm) | Clearance $d_{\min}$ (mm) | Latency |
+|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
+| **$H=1$** | $0.01\,\text{s}$ | **0.8554** | $0.0400\,\text{rad}$ | **$18.21\,\text{mm}$** | $8.87^\circ$ | **$24.00\,\text{mm}$** | **$34.01\,\text{mm}$** | $2.07\,\text{ms}$ |
+| **$H=5$** | $0.05\,\text{s}$ | **0.8715** | $0.0422\,\text{rad}$ | **$19.02\,\text{mm}$** | $9.07^\circ$ | **$26.38\,\text{mm}$** | **$40.04\,\text{mm}$** | $7.09\,\text{ms}$ |
+| **$H=10$** | $0.10\,\text{s}$ | **0.8915** | $0.0461\,\text{rad}$ | **$21.48\,\text{mm}$** | $9.45^\circ$ | **$29.73\,\text{mm}$** | **$49.49\,\text{mm}$** | $10.83\,\text{ms}$ |
+| **$H=20$** | $0.20\,\text{s}$ | **0.9207** | $0.0585\,\text{rad}$ | **$28.74\,\text{mm}$** | $10.39^\circ$ | **$36.90\,\text{mm}$** | **$67.82\,\text{mm}$** | $17.94\,\text{ms}$ |
+| **$H=50$** | $0.50\,\text{s}$ | **0.9811** | $0.0913\,\text{rad}$ | **$46.39\,\text{mm}$** | $13.40^\circ$ | **$55.38\,\text{mm}$** | **$122.27\,\text{mm}$** | $51.41\,\text{ms}$ |
 
 ---
 
@@ -59,7 +86,8 @@ SAWM/
 ├── configs/
 │   ├── simulation.yaml            # Environment, robot limits, and render settings
 │   ├── safety.yaml                # Experimental safety thresholds, hazard coords, scenarios
-│   └── planner.yaml               # Baseline FSM keyframes, tolerances, and IK parameters
+│   ├── planner.yaml               # Baseline FSM keyframes, tolerances, and IK parameters
+│   └── world_model.yaml           # RSSM architecture, dataset, training, and loss hyperparameters
 ├── assets/
 │   └── robots/
 │       └── franka_emika_panda/    # Official MuJoCo Menagerie Franka model & meshes
@@ -75,6 +103,12 @@ SAWM/
 │   ├── ik_solver.py               # 6D DLS Inverse Kinematics with nullspace projection
 │   ├── fsm.py                     # 8-state pick-and-place FSM with explicit failure guards
 │   └── baseline_planner.py        # Conventional task planner with passive safety telemetry
+├── world_model/
+│   ├── __init__.py
+│   ├── rssm.py                    # PyTorch RSSM (Encoder, GRU, Posterior, Prior, Decoder)
+│   ├── dataset.py                 # ObservationBuilder, TrajectoryNormalizer, SequenceDataset
+│   ├── trainer.py                 # RSSMTrainer with KL balancing and checkpointing
+│   └── evaluator.py               # MultiHorizonEvaluator and latency profiler
 ├── safety/
 │   ├── __init__.py
 │   ├── physical_risk.py           # Proximity & contact evaluation
@@ -90,19 +124,24 @@ SAWM/
 ├── scripts/
 │   ├── run_simulation.py          # Milestone 1 simulation runner
 │   ├── run_scenarios.py           # Milestone 2 scenario demonstration runner
-│   └── run_baseline.py            # Milestone 3 baseline planner demonstration runner
+│   ├── run_baseline.py            # Milestone 3 baseline planner demonstration runner
+│   ├── collect_data.py            # Milestone 4 trajectory dataset collector
+│   ├── train_world_model.py       # Milestone 4 RSSM training script
+│   └── evaluate_world_model.py    # Milestone 4 multi-horizon evaluation script
 ├── tests/
 │   ├── test_simulation.py         # Milestone 1 test suite (5 tests)
 │   ├── test_hazards.py            # Milestone 2 test suite (6 tests)
-│   └── test_baseline_planner.py   # Milestone 3 test suite (8 tests)
-├── results/                       # High-resolution demonstration screenshots
+│   ├── test_baseline_planner.py   # Milestone 3 test suite (8 tests)
+│   └── test_world_model.py        # Milestone 4 test suite (7 tests)
+├── results/                       # High-resolution screenshots and evaluation JSONs
 │   ├── milestone1_simulation.png
 │   ├── milestone2_scenario1.png
 │   ├── milestone2_scenario2.png
 │   ├── milestone2_scenario3.png
 │   ├── milestone2_scenario4.png
 │   ├── milestone2_scenario5.png
-│   └── milestone3_baseline.png
+│   ├── milestone3_baseline.png
+│   └── milestone4_evaluation.json
 ├── requirements.txt               # Minimal pinned dependencies
 └── README.md
 ```
@@ -140,7 +179,27 @@ SAWM/
 .\.venv\Scripts\python.exe tests\test_baseline_planner.py
 ```
 
-### 2. Run Demonstration Scripts
+**Run Milestone 4 Tests (Predictive World Model / RSSM):**
+```powershell
+.\.venv\Scripts\python.exe tests\test_world_model.py
+```
+
+### 2. Run Demonstration & Training Scripts
+
+**Collect Trajectory Dataset (Milestone 4):**
+```powershell
+.\.venv\Scripts\python.exe scripts\collect_data.py
+```
+
+**Train RSSM World Model (Milestone 4):**
+```powershell
+.\.venv\Scripts\python.exe scripts\train_world_model.py
+```
+
+**Evaluate RSSM Multi-Horizon Predictions (Milestone 4):**
+```powershell
+.\.venv\Scripts\python.exe scripts\evaluate_world_model.py
+```
 
 **Run Milestone 3 Baseline Task Planner (Pick-and-Place):**
 ```powershell
