@@ -1,0 +1,14 @@
+# SAWM - Safety-Aware World Model
+# Milestone 1: Minimal Simulation Dependencies
+# Python 3.11.9 | Windows 11
+
+# Core simulation
+mujoco>=4.0.0
+numpy>=1.26.0
+PyYAML>=6.0
+
+# Note: Additional dependencies will be added in later milestones:
+# - PyTorch (M4: World Model)
+# - Streamlit, Plotly (M7: Dashboard)
+# - Pandas, Matplotlib (M6: Evaluation)
+# - pytest (Testing)

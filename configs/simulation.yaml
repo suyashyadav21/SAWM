@@ -1,0 +1,46 @@
+# SAWM Simulation Configuration
+# Milestone 1: Minimal Franka Panda Robot Simulation
+
+scene:
+  model_path: "assets/robots/franka_emika_panda/sawm_arena.xml"
+  timestep: 0.002
+  frame_skip: 5  # Control step = 0.01s (100 Hz)
+
+robot:
+  name: "panda"
+  num_arm_joints: 7
+  joint_names:
+    - "joint1"
+    - "joint2"
+    - "joint3"
+    - "joint4"
+    - "joint5"
+    - "joint6"
+    - "joint7"
+  gripper_actuator_name: "actuator8"
+  # Joint position limits in radians (from Franka Emika Panda specs)
+  joint_limits:
+    joint1: [-2.8973, 2.8973]
+    joint2: [-1.7628, 1.7628]
+    joint3: [-2.8973, 2.8973]
+    joint4: [-3.0718, -0.0698]
+    joint5: [-2.8973, 2.8973]
+    joint6: [-0.0175, 3.7525]
+    joint7: [-2.8973, 2.8973]
+  # Default home / ready configuration (radians)
+  home_qpos: [0.0, -0.785398, 0.0, -2.356194, 0.0, 1.570796, 0.785398]
+  # Ready configuration looking down at the table
+  ready_qpos: [0.0, -0.4, 0.0, -2.1, 0.0, 1.7, 0.785]
+  # Target approach configuration (lowered towards the cube)
+  approach_qpos: [0.0, -0.1, 0.0, -2.3, 0.0, 2.2, 0.785]
+
+environment:
+  table_body_name: "table"
+  target_object_body_name: "target_object"
+  goal_zone_body_name: "goal_zone"
+  hand_body_name: "hand"
+
+rendering:
+  width: 1280
+  height: 720
+  default_camera: "workspace_cam"

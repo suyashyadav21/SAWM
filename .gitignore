@@ -1,0 +1,22 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# Virtual Environment
+.venv/
+env/
+venv/
+ENV/
+
+# MuJoCo / Caches
+*.log
+.pytest_cache/
+
+# IDE / System
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
