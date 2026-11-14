@@ -16,14 +16,21 @@ import mujoco
 from typing import Dict, List, Optional, Tuple, Any
 
 from simulation.robot import FrankaPandaRobot
+from simulation.obstacles import ObstacleManager
+from observation.observation_manager import ObservationManager
+from safety.safety_monitor import SafetyMonitor
 
 
 class SawmEnvironment:
     """Primary simulation environment for SAWM research prototype."""
 
-    def __init__(self, config_path: str = "configs/simulation.yaml"):
+    def __init__(self, config_path: str = "configs/simulation.yaml", safety_config_path: str = "configs/safety.yaml"):
         self.config_path = config_path
         self.config = self._load_config(config_path)
+
+        # Load safety configuration if present
+        self.safety_config_path = safety_config_path
+        self.safety_config = self._load_config(safety_config_path) if os.path.exists(safety_config_path) else {}
 
         # Resolve model path
         model_path = self.config["scene"]["model_path"]
@@ -40,6 +47,12 @@ class SawmEnvironment:
 
         # Initialize robot controller
         self.robot = FrankaPandaRobot(self.model, self.data, self.config.get("robot", {}))
+
+        # Initialize hazard & safety managers
+        self.obstacle_manager = ObstacleManager(self.model, self.data, self.safety_config)
+        self.observation_manager = ObservationManager(self.model, self.data, self.safety_config)
+        self.safety_monitor = SafetyMonitor(self.safety_config)
+        self.restricted_zones_enabled = True
 
         # Body IDs for monitoring
         self.table_body_id = mujoco.mj_name2id(
@@ -82,6 +95,9 @@ class SawmEnvironment:
         """
         mujoco.mj_resetData(self.model, self.data)
 
+        # Reset safety monitor
+        self.safety_monitor.reset()
+
         qpos = self.home_qpos if initial_qpos is None else initial_qpos
         self.robot.set_joint_positions_direct(qpos)
         self.robot.set_gripper_target(0.0)  # Open gripper
@@ -111,6 +127,9 @@ class SawmEnvironment:
         if gripper_target is not None:
             self.robot.set_gripper_target(gripper_target)
 
+        # Advance dynamic hazard proxy along trajectory
+        self.obstacle_manager.step_proxy_trajectory()
+
         # Substep physics
         for _ in range(self.frame_skip):
             mujoco.mj_step(self.model, self.data)
@@ -131,7 +150,7 @@ class SawmEnvironment:
         return np.array(self.data.xpos[self.goal_zone_body_id], dtype=np.float64)
 
     def get_observation(self) -> Dict[str, Any]:
-        """Collect complete state observation."""
+        """Collect complete state observation including kinematics, contacts, and safety telemetry."""
         obj_pos, obj_quat = self.get_target_object_pose()
         goal_pos = self.get_goal_position()
         ee_pos, ee_quat = self.robot.get_end_effector_pose()
@@ -140,6 +159,12 @@ class SawmEnvironment:
         ee_to_obj_dist = float(np.linalg.norm(ee_pos - obj_pos))
         # Distance from object to goal
         obj_to_goal_dist = float(np.linalg.norm(obj_pos - goal_pos))
+
+        # Milestone 2 Safety Computations
+        distances = self.observation_manager.compute_distances(self.obstacle_manager)
+        contacts = self.observation_manager.collect_contacts()
+        zone_states = self.observation_manager.evaluate_restricted_zones(self.restricted_zones_enabled)
+        safety_telemetry = self.safety_monitor.update(distances, contacts, zone_states)
 
         return {
             "time": float(self.data.time),
@@ -155,6 +180,16 @@ class SawmEnvironment:
             },
             "contacts": self.get_contacts_summary(),
             "joint_limits": self.robot.check_joint_limits(),
+            # Milestone 2 safety additions
+            "safety": safety_telemetry,
+            "distances": distances,
+            "zone_states": zone_states,
+            "hazards": {
+                "static_active": self.obstacle_manager.is_static_active(),
+                "static_pos": self.obstacle_manager.get_static_obstacle_position(),
+                "proxy_active": self.obstacle_manager.is_proxy_active(),
+                "proxy_pos": self.obstacle_manager.get_proxy_position(),
+            },
         }
 
     # -------------------------------------------------------------------------

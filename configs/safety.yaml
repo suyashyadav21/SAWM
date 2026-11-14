@@ -1,0 +1,91 @@
+# ==============================================================================
+# SAWM - Safety and Hazard Configuration
+# Note: All thresholds and parameters are experimental simulation parameters
+# developed for academic research demonstration, not certified industrial safety limits.
+# ==============================================================================
+
+thresholds:
+  # Experimental proximity thresholds (meters)
+  warning_distance: 0.20        # Yellow alert: hazard nearby
+  danger_distance: 0.08         # Red alert: critical proximity / near-miss
+  collision_distance: 0.00      # Contact threshold (penetration depth < 0)
+  latch_on_collision: true      # If true, physical collision locks state into DANGER until reset
+
+hazards:
+  static_obstacle:
+    enabled: true
+    name: "static_pillar"
+    body_name: "static_obstacle"
+    geom_name: "static_obstacle_geom"
+    type: "cylinder"
+    radius: 0.04
+    half_height: 0.15
+    parked_pos: [2.0, 0.0, -1.0]           # Position when inactive
+    default_active_pos: [0.48, -0.05, 0.55] # Position when active near path
+
+  human_proxy:
+    enabled: true
+    name: "kinematic_arm_proxy"            # Simplified kinematic arm/hand proxy
+    body_name: "human_proxy"
+    geom_name: "human_proxy_geom"
+    type: "capsule"
+    radius: 0.035
+    half_length: 0.10
+    parked_pos: [2.0, 0.0, -1.0]           # Position when inactive
+    home_pos: [0.85, 0.25, 0.60]           # Initial approach entry point
+    speed: 0.20                            # Trajectory speed (m/s)
+
+  restricted_zones:
+    - name: "operator_station"
+      body_name: "restricted_zone"
+      geom_name: "restricted_zone_geom"
+      # World-space Cartesian AABB bounds [xmin, ymin, zmin] to [xmax, ymax, zmax]
+      bounds_min: [0.45, -0.30, 0.40]
+      bounds_max: [0.65, -0.14, 0.60]
+      warning_buffer: 0.05                 # 5 cm buffer around zone for proximity warning
+
+scenarios:
+  scenario1_normal:
+    id: 1
+    name: "Normal Operation"
+    description: "Robot performs standard motion corridor with all hazards parked. Expected status: SAFE."
+    enable_static_obstacle: false
+    enable_human_proxy: false
+    enable_restricted_zone: false
+
+  scenario2_obstacle_path:
+    id: 2
+    name: "Obstacle Near Motion Path"
+    description: "Static pillar placed 0.12m from nominal robot transit corridor. Expected: SAFE -> WARNING -> SAFE."
+    enable_static_obstacle: true
+    static_obstacle_pos: [0.65, 0.18, 0.52]
+    enable_human_proxy: false
+    enable_restricted_zone: false
+
+  scenario3_restricted_zone:
+    id: 3
+    name: "Restricted Zone Approach"
+    description: "Robot trajectory enters operator keep-out volume. Expected: Contextual ZONE_BREACH -> DANGER."
+    enable_static_obstacle: false
+    enable_human_proxy: false
+    enable_restricted_zone: true
+    robot_target_pose: [-0.40, -0.15, 0.0, -2.1, 0.0, 1.8, 0.785] # Enters zone
+
+  scenario4_danger_proximity:
+    id: 4
+    name: "Moving Proxy Encroachment"
+    description: "Kinematic arm proxy moves into robot workspace, breaching danger threshold (d < 0.08m) without contact."
+    enable_static_obstacle: false
+    enable_human_proxy: true
+    human_proxy_start: [0.85, 0.25, 0.60]
+    human_proxy_target: [0.52, 0.12, 0.58]  # Reaches within 3.9cm of robot
+    enable_restricted_zone: false
+
+  scenario5_collision_event:
+    id: 5
+    name: "Physical Collision Event"
+    description: "Static obstacle placed directly in robot approach path. Expected: Collision detected, DANGER latched."
+    enable_static_obstacle: true
+    static_obstacle_pos: [0.45, 0.00, 0.51] # In line with gripper descent
+    enable_human_proxy: false
+    enable_restricted_zone: false

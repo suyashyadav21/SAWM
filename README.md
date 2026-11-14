@@ -4,16 +4,32 @@ A research-oriented prototype investigating safety-aware predictive world modeli
 
 ---
 
-## Milestone 1: Minimal Franka Panda Robot Simulation (COMPLETED)
+## Milestone Status Overview
+
+- **Milestone 0 (Audit & Research):** ✅ Complete
+- **Milestone 1 (Minimal Robot Simulation):** ✅ Complete
+- **Milestone 2 (Hazard & Safety Scenarios):** ✅ **Complete & Verified**
+- **Milestone 3 (Baseline Planner):** ⏳ Next
+- **Milestone 4 (Predictive World Model):** ⏳ Pending
+- **Milestone 5 (Safety Modules):** ⏳ Pending
+- **Milestone 6 (Counterfactual Safety Planning):** ⏳ Pending
+- **Milestone 7 (Interactive Dashboard):** ⏳ Pending
+- **Milestone 8 (Final Validation & Comparative Metrics):** ⏳ Pending
+
+---
+
+## Milestone 2: Hazard & Safety Scenarios (COMPLETED)
 
 ### Overview
-Milestone 1 establishes the core physical simulation foundation:
-- **Physics Engine:** MuJoCo 4.0.1 (native Python bindings)
-- **Robot Model:** Franka Emika Panda (7-DOF arm + 2-finger parallel gripper) obtained from official `google-deepmind/mujoco_menagerie` under Apache-2.0 license
-- **Simulation Scene:** Workstation table, movable target cube with realistic contact dynamics, visual goal zone, and multi-angle observation cameras
-- **Robot Controller:** Position-actuated joint controller with hardware joint limit enforcement and smooth cosine-interpolated trajectory generation
-- **Safety Foundations:** Real-time contact and collision detection, joint limit monitoring, penetration tracking
-- **Rendering:** Multi-camera offscreen rendering (1280×720 RGB) and optional interactive 3D viewer
+Milestone 2 establishes the physical hazard, contextual zone, and centralized safety monitoring system:
+- **11-Body Robot Kinematic Tracking:** Explicitly monitors all 11 robot bodies (`link0`–`link7`, `hand`, `left_finger`, `right_finger`) and 23 active collision geoms.
+- **Physical Hazards:** Static rigid obstacle and dynamic moving hazard proxy (modeled as a simplified kinematic arm/hand representation using MuJoCo mocap bodies).
+- **Surface-to-Surface Distance Engine:** MuJoCo GJK/EPA solver (`mujoco.mj_geomDistance`) computes exact signed Euclidean distances, cleanly distinguished from approximate link-center clearances.
+- **Contextual Keep-Out Zones:** Evaluates 3D Cartesian world coordinates (`data.xpos`, `data.geom_xpos`) against restricted workspace bounding volumes. Joint angles (`qpos`) are strictly excluded from spatial checks.
+- **Centralized Safety Monitor:** 3-tier state machine (`SAFE`, `WARNING`, `DANGER`):
+  - Proximity warnings recover to `SAFE` automatically once hazards clear.
+  - Physical collision events trigger **latched DANGER**, locking the state until an explicit `reset()`.
+- **5 Verified Scenarios:** Fully reproducible demonstration of normal operation, proximity warning, zone breach, danger near-miss, and collision latching.
 
 ---
 
@@ -23,26 +39,44 @@ Milestone 1 establishes the core physical simulation foundation:
 SAWM/
 ├── .venv/                         # Python 3.11.9 virtual environment
 ├── configs/
-│   └── simulation.yaml            # Environment, robot limits, and render settings
+│   ├── simulation.yaml            # Environment, robot limits, and render settings
+│   └── safety.yaml                # Experimental safety thresholds, hazard coords, scenarios
 ├── assets/
 │   └── robots/
 │       └── franka_emika_panda/    # Official MuJoCo Menagerie Franka model & meshes
 │           ├── assets/            # Link & finger OBJ/STL meshes
 │           ├── panda.xml          # Robot definition (Apache-2.0)
-│           ├── sawm_arena.xml     # Simulation arena (table, object, cameras)
+│           ├── sawm_arena.xml     # Arena with hazards, mocap proxies, and zones
 │           └── LICENSE            # Apache-2.0 License
+├── observation/
+│   ├── state.py                   # Structured schemas (RobotState, DistanceMetrics, etc.)
+│   └── observation_manager.py     # 11-body tracker, mj_geomDistance, Cartesian zone evaluator
+├── safety/
+│   ├── __init__.py
+│   ├── physical_risk.py           # Proximity & contact evaluation
+│   ├── contextual_harm.py         # Restricted zone intrusion evaluation
+│   └── safety_monitor.py          # 3-tier state machine with latched collision DANGER
 ├── simulation/
 │   ├── __init__.py
 │   ├── robot.py                   # FrankaPandaRobot controller & state interface
 │   ├── environment.py             # SawmEnvironment MuJoCo wrapper
+│   ├── obstacles.py               # ObstacleManager (mocap body controls)
+│   ├── scenarios.py               # ScenarioManager (orchestrates 5 safety scenarios)
 │   └── utils.py                   # Pure-Python PNG image writer & helpers
 ├── scripts/
-│   └── run_simulation.py          # Demonstration execution script
+│   ├── run_simulation.py          # Milestone 1 simulation runner
+│   └── run_scenarios.py           # Milestone 2 scenario demonstration runner
 ├── tests/
-│   └── test_simulation.py         # Automated test suite (5 test modules)
-├── results/
-│   └── milestone1_simulation.png  # Rendered simulation screenshot (1280x720)
-├── requirements.txt               # Installed dependencies
+│   ├── test_simulation.py         # Milestone 1 test suite (5 tests)
+│   └── test_hazards.py            # Milestone 2 test suite (6 tests)
+├── results/                       # High-resolution demonstration screenshots
+│   ├── milestone1_simulation.png
+│   ├── milestone2_scenario1.png
+│   ├── milestone2_scenario2.png
+│   ├── milestone2_scenario3.png
+│   ├── milestone2_scenario4.png
+│   └── milestone2_scenario5.png
+├── requirements.txt               # Minimal pinned dependencies
 └── README.md
 ```
 
@@ -62,40 +96,43 @@ SAWM/
 
 ## Execution Commands
 
-### 1. Run Automated Test Suite
-Executes all 5 test modules covering environment initialization, joint limits, trajectory execution, contact detection, and offscreen rendering:
+### 1. Run Automated Test Suites
 
+**Run Milestone 1 Tests (Verification of zero regressions):**
 ```powershell
 .\.venv\Scripts\python.exe tests\test_simulation.py
 ```
 
-### 2. Run Simulation Demonstration Script
-Runs a multi-stage trajectory (Home -> Ready -> Tabletop descent -> Grasp -> Release -> Retract) with real-time terminal telemetry and captures a high-resolution screenshot:
-
+**Run Milestone 2 Tests (Hazards & Safety Scenarios):**
 ```powershell
-.\.venv\Scripts\python.exe scripts\run_simulation.py
+.\.venv\Scripts\python.exe tests\test_hazards.py
 ```
 
-### 3. Run with Interactive 3D Viewer (Desktop Display)
-Launches the interactive native MuJoCo passive viewer:
+### 2. Run Scenario Demonstration Scripts
 
+**Run all 5 scenarios sequentially:**
 ```powershell
-.\.venv\Scripts\python.exe scripts\run_simulation.py --view
+.\.venv\Scripts\python.exe scripts\run_scenarios.py --all
+```
+
+**Run an individual scenario (e.g. Scenario 2 - Obstacle Near Path):**
+```powershell
+.\.venv\Scripts\python.exe scripts\run_scenarios.py --scenario 2
+```
+
+**Run with interactive 3D viewer (on desktop display):**
+```powershell
+.\.venv\Scripts\python.exe scripts\run_scenarios.py --scenario 4 --view
 ```
 
 ---
 
-## Milestone 1 Verification Results
+## Milestone 2 Scenario Summary & Acceptance Criteria
 
-| Deliverable | Status | Verification Detail |
-|---|---|---|
-| Python 3.11.9 Virtual Environment | ✅ Complete | Verified at `C:\Projects\SAWM\.venv` |
-| MuJoCo 4.0.1 + NumPy + PyYAML | ✅ Complete | Successfully installed & imported |
-| Franka Panda Model from Menagerie | ✅ Complete | Downloaded with meshes & Apache-2.0 license |
-| Arena Scene (Table + Target Object) | ✅ Complete | `sawm_arena.xml` with table, cube, goal, 3 cameras |
-| Robot Joint Control & Kinematics | ✅ Complete | 7 arm actuators + gripper, cosine interpolation |
-| Joint Limit Verification | ✅ Complete | Hardware limits monitored on all 7 joints |
-| Collision & Contact Detection | ✅ Complete | Object-table & robot-table contact querying |
-| Multi-Camera Offscreen Rendering | ✅ Complete | 1280×720 framebuffer rendering via `mujoco.Renderer` |
-| Saved Screenshot | ✅ Complete | `results/milestone1_simulation.png` (156 KB) |
-| Automated Test Suite | ✅ Complete | 5/5 tests passing |
+| Scenario | Description | Key Metric | Result | Status |
+|---|---|---|---|---|
+| **1. Normal Operation** | Clear workspace | $d_{\min} > 0.25\,\text{m}$, 0 near-misses, 0 collisions | Stays `SAFE` throughout | ✅ PASS |
+| **2. Obstacle Near Path** | Static pillar 0.12m from corridor | $0.08\,\text{m} \le d_{\min} < 0.20\,\text{m}$, 0 collisions | `SAFE` $\rightarrow$ `WARNING` $\rightarrow$ `SAFE` | ✅ PASS |
+| **3. Restricted Zone** | Trajectory enters keep-out box | $d_{\text{zone}} = 0\,\text{m}$, collision = False | `ZONE_BREACH` $\rightarrow$ `DANGER` | ✅ PASS |
+| **4. Moving Kinematic Proxy** | Arm proxy approaches $d = 0.039\,\text{m}$ | $d_{\min} < 0.08\,\text{m}$, near-miss = 1, 0 collisions | `DANGER` $\rightarrow$ recovers to `SAFE` | ✅ PASS |
+| **5. Physical Collision Event** | Obstacle placed directly in path | $con.dist < 0$, collision = 1 | `DANGER` (Latched = True) | ✅ PASS |
