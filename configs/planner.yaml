@@ -1,0 +1,39 @@
+# ==============================================================================
+# SAWM - Baseline Task Planner Configuration
+# Note: Verified against MuJoCo Menagerie Franka Panda and SAWM Arena
+# ==============================================================================
+
+fsm:
+  # Verified heights relative to table top surface (z = 0.400m)
+  table_surface_z: 0.400
+  pregrasp_z: 0.620          # 22cm above table top (clears cube & hazards with margin)
+  grasp_descent_z: 0.525     # Centered grasp depth (aligns finger pads with cube center)
+  lift_z: 0.650              # 25cm above table top (clear lift)
+  place_z: 0.535             # 13.5cm above table (gentle touchdown on table surface)
+  
+  # Timing & Dwell (steps at 100 Hz control frequency)
+  grasp_dwell_steps: 40      # 0.40s hold during grasp
+  release_dwell_steps: 30    # 0.30s hold during release
+  
+  # Trajectory speeds (steps per segment)
+  transit_steps: 70          # Free-space transit steps
+  vertical_steps: 50         # Vertical descent / lift steps
+  
+  # Grasp and placement verification tolerances
+  min_lift_height: 0.045     # Minimum height above table to confirm grasp (m)
+  max_transit_slip: 0.040    # Maximum allowed hand-to-object drift before slippage failure (m)
+  goal_tolerance_radius: 0.060 # Maximum allowed distance to goal center for success (m)
+  fsm_timeout_steps: 250     # Max allowed steps per stage before timeout
+
+ik:
+  damping: 0.001             # DLS damping factor lambda^2
+  nullspace_gain: 0.1        # Posture bias gain towards ready pose
+  max_iterations: 100        # Iteration limit
+  position_tolerance: 0.001  # 1.0 mm position tolerance
+  rotation_tolerance: 0.01   # 0.01 rad orientation tolerance
+  step_size: 0.5             # Gradient step size
+  rot_weight: 0.5            # Weight balancing position and orientation errors
+
+gripper:
+  open_ctrl: 255.0           # Actuator control value for fully open (0.04m per finger)
+  close_ctrl: 0.0            # Actuator control value for fully closed (100N clamp force)
