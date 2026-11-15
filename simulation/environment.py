@@ -179,6 +179,7 @@ class SawmEnvironment:
                 "dist_to_object": obj_to_goal_dist,
             },
             "contacts": self.get_contacts_summary(),
+            "contact_metrics": contacts,
             "joint_limits": self.robot.check_joint_limits(),
             # Milestone 2 safety additions
             "safety": safety_telemetry,
@@ -255,9 +256,22 @@ class SawmEnvironment:
             else:
                 other_contacts.append(c)
 
+        robot_obstacle_contacts = [
+            c for c in other_contacts
+            if ((c["body1"] in robot_body_names and "static_obstacle" in c["body2"]) or
+                (c["body2"] in robot_body_names and "static_obstacle" in c["body1"]))
+        ]
+        robot_proxy_contacts = [
+            c for c in other_contacts
+            if ((c["body1"] in robot_body_names and "human_proxy" in c["body2"]) or
+                (c["body2"] in robot_body_names and "human_proxy" in c["body1"]))
+        ]
+
         return {
             "total_contacts": len(raw_contacts),
             "robot_table_collision": len(robot_table_contacts) > 0,
+            "robot_obstacle_collision": len(robot_obstacle_contacts) > 0,
+            "robot_proxy_collision": len(robot_proxy_contacts) > 0,
             "robot_object_contact": len(robot_object_contacts) > 0,
             "object_table_contact": len(object_table_contacts) > 0,
             "raw_contacts": raw_contacts,

@@ -1,0 +1,1162 @@
+{
+  "metadata": {
+    "created_at": "2026-11-15T19:25:15Z",
+    "stratification_method": "deterministic_category_stratified",
+    "m4_train_episodes": 80,
+    "m4_val_episodes": 20,
+    "m5_augmented_episodes": 40,
+    "total_episodes": 140,
+    "target_partition_sizes": {
+      "train": 106,
+      "calibration": 17,
+      "test": 17
+    },
+    "scenario_targets_augmented": {
+      "pick_approach_collision": {
+        "train": 6,
+        "calibration": 1,
+        "test": 1
+      },
+      "transit_corridor_collision": {
+        "train": 5,
+        "calibration": 2,
+        "test": 1
+      },
+      "place_descent_collision": {
+        "train": 5,
+        "calibration": 1,
+        "test": 2
+      },
+      "dynamic_proxy_collision": {
+        "train": 5,
+        "calibration": 1,
+        "test": 2
+      },
+      "boundary_grazing_hard_negatives": {
+        "train": 5,
+        "calibration": 2,
+        "test": 1
+      }
+    }
+  },
+  "partitions": {
+    "train": {
+      "description": "80 original M4 training episodes + 26 stratified augmented collision episodes",
+      "count": 106,
+      "episodes": [
+        {
+          "source": "m4_original_train",
+          "episode_id": 0,
+          "filepath": "data/trajectories/train/episode_0000.npz",
+          "category": "m4_baseline_mixed",
+          "augmented_collision": false
+        },
+        {
+          "source": "m4_original_train",
+          "episode_id": 1,
+          "filepath": "data/trajectories/train/episode_0001.npz",
+          "category": "m4_baseline_mixed",
+          "augmented_collision": false
+        },
+        {
+          "source": "m4_original_train",
+          "episode_id": 2,
+          "filepath": "data/trajectories/train/episode_0002.npz",
+          "category": "m4_baseline_mixed",
+          "augmented_collision": false
+        },
+        {
+          "source": "m4_original_train",
+          "episode_id": 3,
+          "filepath": "data/trajectories/train/episode_0003.npz",
+          "category": "m4_baseline_mixed",
+          "augmented_collision": false
+        },
+        {
+          "source": "m4_original_train",
+          "episode_id": 4,
+          "filepath": "data/trajectories/train/episode_0004.npz",
+          "category": "m4_baseline_mixed",
+          "augmented_collision": false
+        },
+        {
+          "source": "m4_original_train",
+          "episode_id": 5,
+          "filepath": "data/trajectories/train/episode_0005.npz",
+          "category": "m4_baseline_mixed",
+          "augmented_collision": false
+        },
+        {
+          "source": "m4_original_train",
+          "episode_id": 6,
+          "filepath": "data/trajectories/train/episode_0006.npz",
+          "category": "m4_baseline_mixed",
+          "augmented_collision": false
+        },
+        {
+          "source": "m4_original_train",
+          "episode_id": 7,
+          "filepath": "data/trajectories/train/episode_0007.npz",
+          "category": "m4_baseline_mixed",
+          "augmented_collision": false
+        },
+        {
+          "source": "m4_original_train",
+          "episode_id": 8,
+          "filepath": "data/trajectories/train/episode_0008.npz",
+          "category": "m4_baseline_mixed",
+          "augmented_collision": false
+        },
+        {
+          "source": "m4_original_train",
+          "episode_id": 9,
+          "filepath": "data/trajectories/train/episode_0009.npz",
+          "category": "m4_baseline_mixed",
+          "augmented_collision": false
+        },
+        {
+          "source": "m4_original_train",
+          "episode_id": 10,
+          "filepath": "data/trajectories/train/episode_0010.npz",
+          "category": "m4_baseline_mixed",
+          "augmented_collision": false
+        },
+        {
+          "source": "m4_original_train",
+          "episode_id": 11,
+          "filepath": "data/trajectories/train/episode_0011.npz",
+          "category": "m4_baseline_mixed",
+          "augmented_collision": false
+        },
+        {
+          "source": "m4_original_train",
+          "episode_id": 12,
+          "filepath": "data/trajectories/train/episode_0012.npz",
+          "category": "m4_baseline_mixed",
+          "augmented_collision": false
+        },
+        {
+          "source": "m4_original_train",
+          "episode_id": 13,
+          "filepath": "data/trajectories/train/episode_0013.npz",
+          "category": "m4_baseline_mixed",
+          "augmented_collision": false
+        },
+        {
+          "source": "m4_original_train",
+          "episode_id": 14,
+          "filepath": "data/trajectories/train/episode_0014.npz",
+          "category": "m4_baseline_mixed",
+          "augmented_collision": false
+        },
+        {
+          "source": "m4_original_train",
+          "episode_id": 15,
+          "filepath": "data/trajectories/train/episode_0015.npz",
+          "category": "m4_baseline_mixed",
+          "augmented_collision": false
+        },
+        {
+          "source": "m4_original_train",
+          "episode_id": 16,
+          "filepath": "data/trajectories/train/episode_0016.npz",
+          "category": "m4_baseline_mixed",
+          "augmented_collision": false
+        },
+        {
+          "source": "m4_original_train",
+          "episode_id": 17,
+          "filepath": "data/trajectories/train/episode_0017.npz",
+          "category": "m4_baseline_mixed",
+          "augmented_collision": false
+        },
+        {
+          "source": "m4_original_train",
+          "episode_id": 18,
+          "filepath": "data/trajectories/train/episode_0018.npz",
+          "category": "m4_baseline_mixed",
+          "augmented_collision": false
+        },
+        {
+          "source": "m4_original_train",
+          "episode_id": 19,
+          "filepath": "data/trajectories/train/episode_0019.npz",
+          "category": "m4_baseline_mixed",
+          "augmented_collision": false
+        },
+        {
+          "source": "m4_original_train",
+          "episode_id": 20,
+          "filepath": "data/trajectories/train/episode_0020.npz",
+          "category": "m4_baseline_mixed",
+          "augmented_collision": false
+        },
+        {
+          "source": "m4_original_train",
+          "episode_id": 21,
+          "filepath": "data/trajectories/train/episode_0021.npz",
+          "category": "m4_baseline_mixed",
+          "augmented_collision": false
+        },
+        {
+          "source": "m4_original_train",
+          "episode_id": 22,
+          "filepath": "data/trajectories/train/episode_0022.npz",
+          "category": "m4_baseline_mixed",
+          "augmented_collision": false
+        },
+        {
+          "source": "m4_original_train",
+          "episode_id": 23,
+          "filepath": "data/trajectories/train/episode_0023.npz",
+          "category": "m4_baseline_mixed",
+          "augmented_collision": false
+        },
+        {
+          "source": "m4_original_train",
+          "episode_id": 24,
+          "filepath": "data/trajectories/train/episode_0024.npz",
+          "category": "m4_baseline_mixed",
+          "augmented_collision": false
+        },
+        {
+          "source": "m4_original_train",
+          "episode_id": 25,
+          "filepath": "data/trajectories/train/episode_0025.npz",
+          "category": "m4_baseline_mixed",
+          "augmented_collision": false
+        },
+        {
+          "source": "m4_original_train",
+          "episode_id": 26,
+          "filepath": "data/trajectories/train/episode_0026.npz",
+          "category": "m4_baseline_mixed",
+          "augmented_collision": false
+        },
+        {
+          "source": "m4_original_train",
+          "episode_id": 27,
+          "filepath": "data/trajectories/train/episode_0027.npz",
+          "category": "m4_baseline_mixed",
+          "augmented_collision": false
+        },
+        {
+          "source": "m4_original_train",
+          "episode_id": 28,
+          "filepath": "data/trajectories/train/episode_0028.npz",
+          "category": "m4_baseline_mixed",
+          "augmented_collision": false
+        },
+        {
+          "source": "m4_original_train",
+          "episode_id": 29,
+          "filepath": "data/trajectories/train/episode_0029.npz",
+          "category": "m4_baseline_mixed",
+          "augmented_collision": false
+        },
+        {
+          "source": "m4_original_train",
+          "episode_id": 30,
+          "filepath": "data/trajectories/train/episode_0030.npz",
+          "category": "m4_baseline_mixed",
+          "augmented_collision": false
+        },
+        {
+          "source": "m4_original_train",
+          "episode_id": 31,
+          "filepath": "data/trajectories/train/episode_0031.npz",
+          "category": "m4_baseline_mixed",
+          "augmented_collision": false
+        },
+        {
+          "source": "m4_original_train",
+          "episode_id": 32,
+          "filepath": "data/trajectories/train/episode_0032.npz",
+          "category": "m4_baseline_mixed",
+          "augmented_collision": false
+        },
+        {
+          "source": "m4_original_train",
+          "episode_id": 33,
+          "filepath": "data/trajectories/train/episode_0033.npz",
+          "category": "m4_baseline_mixed",
+          "augmented_collision": false
+        },
+        {
+          "source": "m4_original_train",
+          "episode_id": 34,
+          "filepath": "data/trajectories/train/episode_0034.npz",
+          "category": "m4_baseline_mixed",
+          "augmented_collision": false
+        },
+        {
+          "source": "m4_original_train",
+          "episode_id": 35,
+          "filepath": "data/trajectories/train/episode_0035.npz",
+          "category": "m4_baseline_mixed",
+          "augmented_collision": false
+        },
+        {
+          "source": "m4_original_train",
+          "episode_id": 36,
+          "filepath": "data/trajectories/train/episode_0036.npz",
+          "category": "m4_baseline_mixed",
+          "augmented_collision": false
+        },
+        {
+          "source": "m4_original_train",
+          "episode_id": 37,
+          "filepath": "data/trajectories/train/episode_0037.npz",
+          "category": "m4_baseline_mixed",
+          "augmented_collision": false
+        },
+        {
+          "source": "m4_original_train",
+          "episode_id": 38,
+          "filepath": "data/trajectories/train/episode_0038.npz",
+          "category": "m4_baseline_mixed",
+          "augmented_collision": false
+        },
+        {
+          "source": "m4_original_train",
+          "episode_id": 39,
+          "filepath": "data/trajectories/train/episode_0039.npz",
+          "category": "m4_baseline_mixed",
+          "augmented_collision": false
+        },
+        {
+          "source": "m4_original_train",
+          "episode_id": 40,
+          "filepath": "data/trajectories/train/episode_0040.npz",
+          "category": "m4_baseline_mixed",
+          "augmented_collision": false
+        },
+        {
+          "source": "m4_original_train",
+          "episode_id": 41,
+          "filepath": "data/trajectories/train/episode_0041.npz",
+          "category": "m4_baseline_mixed",
+          "augmented_collision": false
+        },
+        {
+          "source": "m4_original_train",
+          "episode_id": 42,
+          "filepath": "data/trajectories/train/episode_0042.npz",
+          "category": "m4_baseline_mixed",
+          "augmented_collision": false
+        },
+        {
+          "source": "m4_original_train",
+          "episode_id": 43,
+          "filepath": "data/trajectories/train/episode_0043.npz",
+          "category": "m4_baseline_mixed",
+          "augmented_collision": false
+        },
+        {
+          "source": "m4_original_train",
+          "episode_id": 44,
+          "filepath": "data/trajectories/train/episode_0044.npz",
+          "category": "m4_baseline_mixed",
+          "augmented_collision": false
+        },
+        {
+          "source": "m4_original_train",
+          "episode_id": 45,
+          "filepath": "data/trajectories/train/episode_0045.npz",
+          "category": "m4_baseline_mixed",
+          "augmented_collision": false
+        },
+        {
+          "source": "m4_original_train",
+          "episode_id": 46,
+          "filepath": "data/trajectories/train/episode_0046.npz",
+          "category": "m4_baseline_mixed",
+          "augmented_collision": false
+        },
+        {
+          "source": "m4_original_train",
+          "episode_id": 47,
+          "filepath": "data/trajectories/train/episode_0047.npz",
+          "category": "m4_baseline_mixed",
+          "augmented_collision": false
+        },
+        {
+          "source": "m4_original_train",
+          "episode_id": 48,
+          "filepath": "data/trajectories/train/episode_0048.npz",
+          "category": "m4_baseline_mixed",
+          "augmented_collision": false
+        },
+        {
+          "source": "m4_original_train",
+          "episode_id": 49,
+          "filepath": "data/trajectories/train/episode_0049.npz",
+          "category": "m4_baseline_mixed",
+          "augmented_collision": false
+        },
+        {
+          "source": "m4_original_train",
+          "episode_id": 50,
+          "filepath": "data/trajectories/train/episode_0050.npz",
+          "category": "m4_baseline_mixed",
+          "augmented_collision": false
+        },
+        {
+          "source": "m4_original_train",
+          "episode_id": 51,
+          "filepath": "data/trajectories/train/episode_0051.npz",
+          "category": "m4_baseline_mixed",
+          "augmented_collision": false
+        },
+        {
+          "source": "m4_original_train",
+          "episode_id": 52,
+          "filepath": "data/trajectories/train/episode_0052.npz",
+          "category": "m4_baseline_mixed",
+          "augmented_collision": false
+        },
+        {
+          "source": "m4_original_train",
+          "episode_id": 53,
+          "filepath": "data/trajectories/train/episode_0053.npz",
+          "category": "m4_baseline_mixed",
+          "augmented_collision": false
+        },
+        {
+          "source": "m4_original_train",
+          "episode_id": 54,
+          "filepath": "data/trajectories/train/episode_0054.npz",
+          "category": "m4_baseline_mixed",
+          "augmented_collision": false
+        },
+        {
+          "source": "m4_original_train",
+          "episode_id": 55,
+          "filepath": "data/trajectories/train/episode_0055.npz",
+          "category": "m4_baseline_mixed",
+          "augmented_collision": false
+        },
+        {
+          "source": "m4_original_train",
+          "episode_id": 56,
+          "filepath": "data/trajectories/train/episode_0056.npz",
+          "category": "m4_baseline_mixed",
+          "augmented_collision": false
+        },
+        {
+          "source": "m4_original_train",
+          "episode_id": 57,
+          "filepath": "data/trajectories/train/episode_0057.npz",
+          "category": "m4_baseline_mixed",
+          "augmented_collision": false
+        },
+        {
+          "source": "m4_original_train",
+          "episode_id": 58,
+          "filepath": "data/trajectories/train/episode_0058.npz",
+          "category": "m4_baseline_mixed",
+          "augmented_collision": false
+        },
+        {
+          "source": "m4_original_train",
+          "episode_id": 59,
+          "filepath": "data/trajectories/train/episode_0059.npz",
+          "category": "m4_baseline_mixed",
+          "augmented_collision": false
+        },
+        {
+          "source": "m4_original_train",
+          "episode_id": 60,
+          "filepath": "data/trajectories/train/episode_0060.npz",
+          "category": "m4_baseline_mixed",
+          "augmented_collision": false
+        },
+        {
+          "source": "m4_original_train",
+          "episode_id": 61,
+          "filepath": "data/trajectories/train/episode_0061.npz",
+          "category": "m4_baseline_mixed",
+          "augmented_collision": false
+        },
+        {
+          "source": "m4_original_train",
+          "episode_id": 62,
+          "filepath": "data/trajectories/train/episode_0062.npz",
+          "category": "m4_baseline_mixed",
+          "augmented_collision": false
+        },
+        {
+          "source": "m4_original_train",
+          "episode_id": 63,
+          "filepath": "data/trajectories/train/episode_0063.npz",
+          "category": "m4_baseline_mixed",
+          "augmented_collision": false
+        },
+        {
+          "source": "m4_original_train",
+          "episode_id": 64,
+          "filepath": "data/trajectories/train/episode_0064.npz",
+          "category": "m4_baseline_mixed",
+          "augmented_collision": false
+        },
+        {
+          "source": "m4_original_train",
+          "episode_id": 65,
+          "filepath": "data/trajectories/train/episode_0065.npz",
+          "category": "m4_baseline_mixed",
+          "augmented_collision": false
+        },
+        {
+          "source": "m4_original_train",
+          "episode_id": 66,
+          "filepath": "data/trajectories/train/episode_0066.npz",
+          "category": "m4_baseline_mixed",
+          "augmented_collision": false
+        },
+        {
+          "source": "m4_original_train",
+          "episode_id": 67,
+          "filepath": "data/trajectories/train/episode_0067.npz",
+          "category": "m4_baseline_mixed",
+          "augmented_collision": false
+        },
+        {
+          "source": "m4_original_train",
+          "episode_id": 68,
+          "filepath": "data/trajectories/train/episode_0068.npz",
+          "category": "m4_baseline_mixed",
+          "augmented_collision": false
+        },
+        {
+          "source": "m4_original_train",
+          "episode_id": 69,
+          "filepath": "data/trajectories/train/episode_0069.npz",
+          "category": "m4_baseline_mixed",
+          "augmented_collision": false
+        },
+        {
+          "source": "m4_original_train",
+          "episode_id": 70,
+          "filepath": "data/trajectories/train/episode_0070.npz",
+          "category": "m4_baseline_mixed",
+          "augmented_collision": false
+        },
+        {
+          "source": "m4_original_train",
+          "episode_id": 71,
+          "filepath": "data/trajectories/train/episode_0071.npz",
+          "category": "m4_baseline_mixed",
+          "augmented_collision": false
+        },
+        {
+          "source": "m4_original_train",
+          "episode_id": 72,
+          "filepath": "data/trajectories/train/episode_0072.npz",
+          "category": "m4_baseline_mixed",
+          "augmented_collision": false
+        },
+        {
+          "source": "m4_original_train",
+          "episode_id": 73,
+          "filepath": "data/trajectories/train/episode_0073.npz",
+          "category": "m4_baseline_mixed",
+          "augmented_collision": false
+        },
+        {
+          "source": "m4_original_train",
+          "episode_id": 74,
+          "filepath": "data/trajectories/train/episode_0074.npz",
+          "category": "m4_baseline_mixed",
+          "augmented_collision": false
+        },
+        {
+          "source": "m4_original_train",
+          "episode_id": 75,
+          "filepath": "data/trajectories/train/episode_0075.npz",
+          "category": "m4_baseline_mixed",
+          "augmented_collision": false
+        },
+        {
+          "source": "m4_original_train",
+          "episode_id": 76,
+          "filepath": "data/trajectories/train/episode_0076.npz",
+          "category": "m4_baseline_mixed",
+          "augmented_collision": false
+        },
+        {
+          "source": "m4_original_train",
+          "episode_id": 77,
+          "filepath": "data/trajectories/train/episode_0077.npz",
+          "category": "m4_baseline_mixed",
+          "augmented_collision": false
+        },
+        {
+          "source": "m4_original_train",
+          "episode_id": 78,
+          "filepath": "data/trajectories/train/episode_0078.npz",
+          "category": "m4_baseline_mixed",
+          "augmented_collision": false
+        },
+        {
+          "source": "m4_original_train",
+          "episode_id": 79,
+          "filepath": "data/trajectories/train/episode_0079.npz",
+          "category": "m4_baseline_mixed",
+          "augmented_collision": false
+        },
+        {
+          "source": "m5_augmented_collision",
+          "episode_id": 0,
+          "filepath": "data/augmented_collisions/collision_0000.npz",
+          "category": "pick_approach_collision",
+          "augmented_collision": true,
+          "collision_occurred": true,
+          "first_contact_step": 42,
+          "min_clearance": -0.0043469504453241825
+        },
+        {
+          "source": "m5_augmented_collision",
+          "episode_id": 1,
+          "filepath": "data/augmented_collisions/collision_0001.npz",
+          "category": "pick_approach_collision",
+          "augmented_collision": true,
+          "collision_occurred": true,
+          "first_contact_step": 46,
+          "min_clearance": -0.004038466140627861
+        },
+        {
+          "source": "m5_augmented_collision",
+          "episode_id": 2,
+          "filepath": "data/augmented_collisions/collision_0002.npz",
+          "category": "pick_approach_collision",
+          "augmented_collision": true,
+          "collision_occurred": true,
+          "first_contact_step": 40,
+          "min_clearance": -0.003219357691705227
+        },
+        {
+          "source": "m5_augmented_collision",
+          "episode_id": 3,
+          "filepath": "data/augmented_collisions/collision_0003.npz",
+          "category": "pick_approach_collision",
+          "augmented_collision": true,
+          "collision_occurred": true,
+          "first_contact_step": 48,
+          "min_clearance": -0.0040198336355388165
+        },
+        {
+          "source": "m5_augmented_collision",
+          "episode_id": 4,
+          "filepath": "data/augmented_collisions/collision_0004.npz",
+          "category": "pick_approach_collision",
+          "augmented_collision": true,
+          "collision_occurred": true,
+          "first_contact_step": 48,
+          "min_clearance": -0.004209131468087435
+        },
+        {
+          "source": "m5_augmented_collision",
+          "episode_id": 5,
+          "filepath": "data/augmented_collisions/collision_0005.npz",
+          "category": "pick_approach_collision",
+          "augmented_collision": true,
+          "collision_occurred": true,
+          "first_contact_step": 41,
+          "min_clearance": -0.003930235281586647
+        },
+        {
+          "source": "m5_augmented_collision",
+          "episode_id": 8,
+          "filepath": "data/augmented_collisions/collision_0008.npz",
+          "category": "transit_corridor_collision",
+          "augmented_collision": true,
+          "collision_occurred": true,
+          "first_contact_step": 76,
+          "min_clearance": -0.0019501486094668508
+        },
+        {
+          "source": "m5_augmented_collision",
+          "episode_id": 9,
+          "filepath": "data/augmented_collisions/collision_0009.npz",
+          "category": "transit_corridor_collision",
+          "augmented_collision": true,
+          "collision_occurred": true,
+          "first_contact_step": 245,
+          "min_clearance": -0.0017793670995160937
+        },
+        {
+          "source": "m5_augmented_collision",
+          "episode_id": 10,
+          "filepath": "data/augmented_collisions/collision_0010.npz",
+          "category": "transit_corridor_collision",
+          "augmented_collision": true,
+          "collision_occurred": true,
+          "first_contact_step": 246,
+          "min_clearance": -0.003136692102998495
+        },
+        {
+          "source": "m5_augmented_collision",
+          "episode_id": 11,
+          "filepath": "data/augmented_collisions/collision_0011.npz",
+          "category": "transit_corridor_collision",
+          "augmented_collision": true,
+          "collision_occurred": true,
+          "first_contact_step": 257,
+          "min_clearance": -0.0032770438119769096
+        },
+        {
+          "source": "m5_augmented_collision",
+          "episode_id": 12,
+          "filepath": "data/augmented_collisions/collision_0012.npz",
+          "category": "transit_corridor_collision",
+          "augmented_collision": true,
+          "collision_occurred": true,
+          "first_contact_step": 76,
+          "min_clearance": -0.0020407952833920717
+        },
+        {
+          "source": "m5_augmented_collision",
+          "episode_id": 16,
+          "filepath": "data/augmented_collisions/collision_0016.npz",
+          "category": "place_descent_collision",
+          "augmented_collision": true,
+          "collision_occurred": true,
+          "first_contact_step": 274,
+          "min_clearance": -0.0035050876904278994
+        },
+        {
+          "source": "m5_augmented_collision",
+          "episode_id": 17,
+          "filepath": "data/augmented_collisions/collision_0017.npz",
+          "category": "place_descent_collision",
+          "augmented_collision": true,
+          "collision_occurred": true,
+          "first_contact_step": 275,
+          "min_clearance": -0.0038587211165577173
+        },
+        {
+          "source": "m5_augmented_collision",
+          "episode_id": 18,
+          "filepath": "data/augmented_collisions/collision_0018.npz",
+          "category": "place_descent_collision",
+          "augmented_collision": true,
+          "collision_occurred": true,
+          "first_contact_step": 276,
+          "min_clearance": -0.0028691652696579695
+        },
+        {
+          "source": "m5_augmented_collision",
+          "episode_id": 19,
+          "filepath": "data/augmented_collisions/collision_0019.npz",
+          "category": "place_descent_collision",
+          "augmented_collision": true,
+          "collision_occurred": true,
+          "first_contact_step": 282,
+          "min_clearance": -0.0026726420037448406
+        },
+        {
+          "source": "m5_augmented_collision",
+          "episode_id": 20,
+          "filepath": "data/augmented_collisions/collision_0020.npz",
+          "category": "place_descent_collision",
+          "augmented_collision": true,
+          "collision_occurred": true,
+          "first_contact_step": 271,
+          "min_clearance": -0.003280684119090438
+        },
+        {
+          "source": "m5_augmented_collision",
+          "episode_id": 24,
+          "filepath": "data/augmented_collisions/collision_0024.npz",
+          "category": "dynamic_proxy_collision",
+          "augmented_collision": true,
+          "collision_occurred": true,
+          "first_contact_step": 264,
+          "min_clearance": -0.003728520590811968
+        },
+        {
+          "source": "m5_augmented_collision",
+          "episode_id": 25,
+          "filepath": "data/augmented_collisions/collision_0025.npz",
+          "category": "dynamic_proxy_collision",
+          "augmented_collision": true,
+          "collision_occurred": true,
+          "first_contact_step": 244,
+          "min_clearance": -0.001586885191500187
+        },
+        {
+          "source": "m5_augmented_collision",
+          "episode_id": 26,
+          "filepath": "data/augmented_collisions/collision_0026.npz",
+          "category": "dynamic_proxy_collision",
+          "augmented_collision": true,
+          "collision_occurred": true,
+          "first_contact_step": 262,
+          "min_clearance": -0.0029925196431577206
+        },
+        {
+          "source": "m5_augmented_collision",
+          "episode_id": 27,
+          "filepath": "data/augmented_collisions/collision_0027.npz",
+          "category": "dynamic_proxy_collision",
+          "augmented_collision": true,
+          "collision_occurred": true,
+          "first_contact_step": 162,
+          "min_clearance": -0.006690670736134052
+        },
+        {
+          "source": "m5_augmented_collision",
+          "episode_id": 28,
+          "filepath": "data/augmented_collisions/collision_0028.npz",
+          "category": "dynamic_proxy_collision",
+          "augmented_collision": true,
+          "collision_occurred": true,
+          "first_contact_step": 163,
+          "min_clearance": -0.006817607209086418
+        },
+        {
+          "source": "m5_augmented_collision",
+          "episode_id": 32,
+          "filepath": "data/augmented_collisions/collision_0032.npz",
+          "category": "boundary_grazing_hard_negatives",
+          "augmented_collision": true,
+          "collision_occurred": true,
+          "first_contact_step": 420,
+          "min_clearance": -4.530815203906968e-05
+        },
+        {
+          "source": "m5_augmented_collision",
+          "episode_id": 33,
+          "filepath": "data/augmented_collisions/collision_0033.npz",
+          "category": "boundary_grazing_hard_negatives",
+          "augmented_collision": true,
+          "collision_occurred": false,
+          "first_contact_step": null,
+          "min_clearance": 0.009730123914778233
+        },
+        {
+          "source": "m5_augmented_collision",
+          "episode_id": 34,
+          "filepath": "data/augmented_collisions/collision_0034.npz",
+          "category": "boundary_grazing_hard_negatives",
+          "augmented_collision": true,
+          "collision_occurred": false,
+          "first_contact_step": null,
+          "min_clearance": 0.006957540288567543
+        },
+        {
+          "source": "m5_augmented_collision",
+          "episode_id": 36,
+          "filepath": "data/augmented_collisions/collision_0036.npz",
+          "category": "boundary_grazing_hard_negatives",
+          "augmented_collision": true,
+          "collision_occurred": true,
+          "first_contact_step": 304,
+          "min_clearance": -0.0009143322240561247
+        },
+        {
+          "source": "m5_augmented_collision",
+          "episode_id": 37,
+          "filepath": "data/augmented_collisions/collision_0037.npz",
+          "category": "boundary_grazing_hard_negatives",
+          "augmented_collision": true,
+          "collision_occurred": true,
+          "first_contact_step": 319,
+          "min_clearance": -0.00020036386558786035
+        }
+      ]
+    },
+    "calibration": {
+      "description": "10 held-out M4 validation episodes (val/ep_0000..0009, IDs 80..89) + 7 stratified augmented collision episodes",
+      "count": 17,
+      "episodes": [
+        {
+          "source": "m4_original_val",
+          "global_episode_id": 80,
+          "filepath": "data/trajectories/val/episode_0000.npz",
+          "category": "m4_baseline_mixed",
+          "augmented_collision": false
+        },
+        {
+          "source": "m4_original_val",
+          "global_episode_id": 81,
+          "filepath": "data/trajectories/val/episode_0001.npz",
+          "category": "m4_baseline_mixed",
+          "augmented_collision": false
+        },
+        {
+          "source": "m4_original_val",
+          "global_episode_id": 82,
+          "filepath": "data/trajectories/val/episode_0002.npz",
+          "category": "m4_baseline_mixed",
+          "augmented_collision": false
+        },
+        {
+          "source": "m4_original_val",
+          "global_episode_id": 83,
+          "filepath": "data/trajectories/val/episode_0003.npz",
+          "category": "m4_baseline_mixed",
+          "augmented_collision": false
+        },
+        {
+          "source": "m4_original_val",
+          "global_episode_id": 84,
+          "filepath": "data/trajectories/val/episode_0004.npz",
+          "category": "m4_baseline_mixed",
+          "augmented_collision": false
+        },
+        {
+          "source": "m4_original_val",
+          "global_episode_id": 85,
+          "filepath": "data/trajectories/val/episode_0005.npz",
+          "category": "m4_baseline_mixed",
+          "augmented_collision": false
+        },
+        {
+          "source": "m4_original_val",
+          "global_episode_id": 86,
+          "filepath": "data/trajectories/val/episode_0006.npz",
+          "category": "m4_baseline_mixed",
+          "augmented_collision": false
+        },
+        {
+          "source": "m4_original_val",
+          "global_episode_id": 87,
+          "filepath": "data/trajectories/val/episode_0007.npz",
+          "category": "m4_baseline_mixed",
+          "augmented_collision": false
+        },
+        {
+          "source": "m4_original_val",
+          "global_episode_id": 88,
+          "filepath": "data/trajectories/val/episode_0008.npz",
+          "category": "m4_baseline_mixed",
+          "augmented_collision": false
+        },
+        {
+          "source": "m4_original_val",
+          "global_episode_id": 89,
+          "filepath": "data/trajectories/val/episode_0009.npz",
+          "category": "m4_baseline_mixed",
+          "augmented_collision": false
+        },
+        {
+          "source": "m5_augmented_collision",
+          "episode_id": 6,
+          "filepath": "data/augmented_collisions/collision_0006.npz",
+          "category": "pick_approach_collision",
+          "augmented_collision": true,
+          "collision_occurred": true,
+          "first_contact_step": 52,
+          "min_clearance": -0.004337983205914497
+        },
+        {
+          "source": "m5_augmented_collision",
+          "episode_id": 13,
+          "filepath": "data/augmented_collisions/collision_0013.npz",
+          "category": "transit_corridor_collision",
+          "augmented_collision": true,
+          "collision_occurred": true,
+          "first_contact_step": 70,
+          "min_clearance": -0.0017901225946843624
+        },
+        {
+          "source": "m5_augmented_collision",
+          "episode_id": 14,
+          "filepath": "data/augmented_collisions/collision_0014.npz",
+          "category": "transit_corridor_collision",
+          "augmented_collision": true,
+          "collision_occurred": true,
+          "first_contact_step": 75,
+          "min_clearance": -0.0017723721684888005
+        },
+        {
+          "source": "m5_augmented_collision",
+          "episode_id": 21,
+          "filepath": "data/augmented_collisions/collision_0021.npz",
+          "category": "place_descent_collision",
+          "augmented_collision": true,
+          "collision_occurred": true,
+          "first_contact_step": 282,
+          "min_clearance": -0.0042481315322220325
+        },
+        {
+          "source": "m5_augmented_collision",
+          "episode_id": 29,
+          "filepath": "data/augmented_collisions/collision_0029.npz",
+          "category": "dynamic_proxy_collision",
+          "augmented_collision": true,
+          "collision_occurred": true,
+          "first_contact_step": 260,
+          "min_clearance": -0.003598294220864773
+        },
+        {
+          "source": "m5_augmented_collision",
+          "episode_id": 35,
+          "filepath": "data/augmented_collisions/collision_0035.npz",
+          "category": "boundary_grazing_hard_negatives",
+          "augmented_collision": true,
+          "collision_occurred": false,
+          "first_contact_step": null,
+          "min_clearance": 0.003353880951181054
+        },
+        {
+          "source": "m5_augmented_collision",
+          "episode_id": 39,
+          "filepath": "data/augmented_collisions/collision_0039.npz",
+          "category": "boundary_grazing_hard_negatives",
+          "augmented_collision": true,
+          "collision_occurred": true,
+          "first_contact_step": 313,
+          "min_clearance": -0.0003746743022929877
+        }
+      ]
+    },
+    "test": {
+      "description": "10 held-out M4 validation episodes (val/ep_0010..0019, IDs 90..99) + 7 stratified augmented collision episodes",
+      "count": 17,
+      "episodes": [
+        {
+          "source": "m4_original_val",
+          "global_episode_id": 90,
+          "filepath": "data/trajectories/val/episode_0010.npz",
+          "category": "m4_baseline_mixed",
+          "augmented_collision": false
+        },
+        {
+          "source": "m4_original_val",
+          "global_episode_id": 91,
+          "filepath": "data/trajectories/val/episode_0011.npz",
+          "category": "m4_baseline_mixed",
+          "augmented_collision": false
+        },
+        {
+          "source": "m4_original_val",
+          "global_episode_id": 92,
+          "filepath": "data/trajectories/val/episode_0012.npz",
+          "category": "m4_baseline_mixed",
+          "augmented_collision": false
+        },
+        {
+          "source": "m4_original_val",
+          "global_episode_id": 93,
+          "filepath": "data/trajectories/val/episode_0013.npz",
+          "category": "m4_baseline_mixed",
+          "augmented_collision": false
+        },
+        {
+          "source": "m4_original_val",
+          "global_episode_id": 94,
+          "filepath": "data/trajectories/val/episode_0014.npz",
+          "category": "m4_baseline_mixed",
+          "augmented_collision": false
+        },
+        {
+          "source": "m4_original_val",
+          "global_episode_id": 95,
+          "filepath": "data/trajectories/val/episode_0015.npz",
+          "category": "m4_baseline_mixed",
+          "augmented_collision": false
+        },
+        {
+          "source": "m4_original_val",
+          "global_episode_id": 96,
+          "filepath": "data/trajectories/val/episode_0016.npz",
+          "category": "m4_baseline_mixed",
+          "augmented_collision": false
+        },
+        {
+          "source": "m4_original_val",
+          "global_episode_id": 97,
+          "filepath": "data/trajectories/val/episode_0017.npz",
+          "category": "m4_baseline_mixed",
+          "augmented_collision": false
+        },
+        {
+          "source": "m4_original_val",
+          "global_episode_id": 98,
+          "filepath": "data/trajectories/val/episode_0018.npz",
+          "category": "m4_baseline_mixed",
+          "augmented_collision": false
+        },
+        {
+          "source": "m4_original_val",
+          "global_episode_id": 99,
+          "filepath": "data/trajectories/val/episode_0019.npz",
+          "category": "m4_baseline_mixed",
+          "augmented_collision": false
+        },
+        {
+          "source": "m5_augmented_collision",
+          "episode_id": 7,
+          "filepath": "data/augmented_collisions/collision_0007.npz",
+          "category": "pick_approach_collision",
+          "augmented_collision": true,
+          "collision_occurred": true,
+          "first_contact_step": 41,
+          "min_clearance": -0.0042865220457315445
+        },
+        {
+          "source": "m5_augmented_collision",
+          "episode_id": 15,
+          "filepath": "data/augmented_collisions/collision_0015.npz",
+          "category": "transit_corridor_collision",
+          "augmented_collision": true,
+          "collision_occurred": true,
+          "first_contact_step": 255,
+          "min_clearance": -0.003262232057750225
+        },
+        {
+          "source": "m5_augmented_collision",
+          "episode_id": 22,
+          "filepath": "data/augmented_collisions/collision_0022.npz",
+          "category": "place_descent_collision",
+          "augmented_collision": true,
+          "collision_occurred": true,
+          "first_contact_step": 275,
+          "min_clearance": -0.004167531616985798
+        },
+        {
+          "source": "m5_augmented_collision",
+          "episode_id": 23,
+          "filepath": "data/augmented_collisions/collision_0023.npz",
+          "category": "place_descent_collision",
+          "augmented_collision": true,
+          "collision_occurred": true,
+          "first_contact_step": 279,
+          "min_clearance": -0.003213670803233981
+        },
+        {
+          "source": "m5_augmented_collision",
+          "episode_id": 30,
+          "filepath": "data/augmented_collisions/collision_0030.npz",
+          "category": "dynamic_proxy_collision",
+          "augmented_collision": true,
+          "collision_occurred": true,
+          "first_contact_step": 141,
+          "min_clearance": -0.005767736118286848
+        },
+        {
+          "source": "m5_augmented_collision",
+          "episode_id": 31,
+          "filepath": "data/augmented_collisions/collision_0031.npz",
+          "category": "dynamic_proxy_collision",
+          "augmented_collision": true,
+          "collision_occurred": true,
+          "first_contact_step": 264,
+          "min_clearance": -0.004231046419590712
+        },
+        {
+          "source": "m5_augmented_collision",
+          "episode_id": 38,
+          "filepath": "data/augmented_collisions/collision_0038.npz",
+          "category": "boundary_grazing_hard_negatives",
+          "augmented_collision": true,
+          "collision_occurred": false,
+          "first_contact_step": null,
+          "min_clearance": 0.003609860548749566
+        }
+      ]
+    }
+  }
+}
