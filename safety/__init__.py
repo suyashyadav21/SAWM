@@ -20,6 +20,16 @@ from safety.predictive_physical_head import (
 )
 from safety.predictive_contextual_head import PredictiveContextualHarmHead
 from safety.predictive_safety_system import PredictiveSafetySystem
+from safety.safety_supervisor import (
+    SafetySupervisor,
+    SupervisorState,
+    StopMode,
+    ReactiveTelemetry,
+    TacticalTelemetry,
+    StrategicTelemetry,
+    BrakingTrajectoryResult,
+    InterventionCommand,
+)
 
 __all__ = [
     "PhysicalRiskMonitor",
@@ -31,4 +41,12 @@ __all__ = [
     "HORIZONS",
     "HORIZON_WEIGHTS",
     "HORIZON_INDICES",
+    "SafetySupervisor",
+    "SupervisorState",
+    "StopMode",
+    "ReactiveTelemetry",
+    "TacticalTelemetry",
+    "StrategicTelemetry",
+    "BrakingTrajectoryResult",
+    "InterventionCommand",
 ]
