@@ -19,6 +19,7 @@ from simulation.robot import FrankaPandaRobot
 from simulation.obstacles import ObstacleManager
 from observation.observation_manager import ObservationManager
 from safety.safety_monitor import SafetyMonitor
+from safety.safety_supervisor import SafetySupervisor, SupervisorState
 
 
 class SawmEnvironment:
@@ -75,6 +76,9 @@ class SawmEnvironment:
         self._render_width = int(self.config["rendering"].get("width", 1280))
         self._render_height = int(self.config["rendering"].get("height", 720))
 
+        # Simulation-level recovery authorization tracking (not a security boundary)
+        self._inhibiting_supervisor: Optional[SafetySupervisor] = None
+
         # Reset to initial state
         self.reset()
 
@@ -86,14 +90,97 @@ class SawmEnvironment:
     # -------------------------------------------------------------------------
     # Lifecycle & Stepping
     # -------------------------------------------------------------------------
-    def reset(self, initial_qpos: Optional[np.ndarray] = None) -> Dict[str, Any]:
+    def inhibit_arm_actuators(self, supervisor: Optional[SafetySupervisor] = None) -> None:
+        """
+        Genuinely inhibit arm actuators (Safe Torque Off) and bind the inhibition event
+        to the specific SafetySupervisor instance responsible.
+
+        If supervisor is None, actuators remain inhibited with zero torque;
+        automatic substitution of a different supervisor is strictly prohibited.
+
+        NOTE: Simulation-level recovery authorization mechanism, not a security boundary
+        against arbitrary Python code execution.
+        """
+        self.robot.inhibit_arm_actuators()
+        if self._inhibiting_supervisor is None and supervisor is not None:
+            if not isinstance(supervisor, SafetySupervisor):
+                raise TypeError(f"supervisor must be a genuine SafetySupervisor instance, got {type(supervisor)}")
+            self._inhibiting_supervisor = supervisor
+
+    def authorize_actuator_recovery(self, supervisor: Any) -> Tuple[bool, str]:
+        """
+        Explicit, validated actuator recovery authorization from the bound SafetySupervisor.
+
+        CRITICAL RECOVERY INTEGRITY:
+        Actuator restoration is authorized ONLY if:
+        1. A genuine SafetySupervisor instance is provided (isinstance check).
+        2. If arm actuators are inhibited, the supervisor instance matches the specific
+           SafetySupervisor that initiated the active inhibition latch (self._inhibiting_supervisor).
+        3. The supervisor is not latched (supervisor.is_latched is False).
+        4. The supervisor provides verified evidence of completing an explicit operator-confirmed
+           recovery handshake (supervisor.has_completed_recovery_handshake is True).
+        5. The supervisor is currently in RECOVERY or NORMAL state. A supervisor in NORMAL cannot
+           authorize recovery unless it is proven to have legitimately passed through RECOVERY.
+
+        NOTE: Simulation-level recovery authorization mechanism, not a security boundary
+        against arbitrary Python code execution.
+
+        Returns:
+            (authorized: bool, message: str)
+        """
+        if supervisor is None:
+            return False, "RECOVERY_REJECTED: Valid SafetySupervisor instance required"
+
+        if not isinstance(supervisor, SafetySupervisor):
+            return False, "RECOVERY_REJECTED: Arbitrary or fake supervisor object rejected. Genuine SafetySupervisor instance required."
+
+        if self.robot.arm_actuators_inhibited:
+            if self._inhibiting_supervisor is None:
+                return False, (
+                    "RECOVERY_REJECTED: Active inhibition has no bound supervisor recorded. "
+                    "Actuators remain inhibited; automatic substitution of an unauthorized supervisor "
+                    "is prohibited."
+                )
+
+            if supervisor is not self._inhibiting_supervisor:
+                return False, "RECOVERY_REJECTED: Supervisor identity mismatch. Recovery must be authorized by the specific SafetySupervisor instance that triggered inhibition."
+
+        if supervisor.is_latched:
+            return False, "RECOVERY_REJECTED: Supervisor is latched in emergency stop. Operator reset required."
+
+        if not getattr(supervisor, "has_completed_recovery_handshake", False):
+            return False, "RECOVERY_REJECTED: Supervisor has not completed an explicit operator-confirmed recovery handshake."
+
+        if supervisor.state not in (SupervisorState.RECOVERY, SupervisorState.NORMAL):
+            return False, f"RECOVERY_REJECTED: Supervisor must be in RECOVERY or NORMAL state, currently {supervisor.state}"
+
+        self.robot._restore_arm_actuators()
+        self._inhibiting_supervisor = None
+        return True, f"RECOVERY_AUTHORIZED: Arm actuators re-enabled under supervisor state {supervisor.state.value}"
+
+    def reset(
+        self,
+        initial_qpos: Optional[np.ndarray] = None,
+        recovery_supervisor: Optional[Any] = None,
+    ) -> Dict[str, Any]:
         """
         Reset simulation to initial state.
-        
+
+        CRITICAL LATCH INTEGRITY:
+        Does NOT unconditionally re-enable arm actuators if they were inhibited.
+        An existing arm actuator inhibition latch persists across reset unless
+        explicitly authorized via recovery_supervisor or authorize_actuator_recovery().
+
         Args:
             initial_qpos: Optional 7-dim arm joint configuration. Defaults to home_qpos.
+            recovery_supervisor: Optional SafetySupervisor instance. If provided and authorized,
+                                 restores arm actuators if they were previously inhibited.
         """
         mujoco.mj_resetData(self.model, self.data)
+
+        # Actuator restoration requires explicit validated recovery authorization
+        if recovery_supervisor is not None:
+            self.authorize_actuator_recovery(recovery_supervisor)
 
         # Reset safety monitor
         self.safety_monitor.reset()
@@ -111,19 +198,31 @@ class SawmEnvironment:
 
         return self.get_observation()
 
-    def step(self, arm_targets: Optional[np.ndarray] = None, gripper_target: Optional[float] = None) -> Dict[str, Any]:
+    def step(
+        self,
+        arm_targets: Optional[np.ndarray] = None,
+        gripper_target: Optional[float] = None,
+        actuator_inhibit: bool = False,
+        supervisor: Optional[SafetySupervisor] = None,
+    ) -> Dict[str, Any]:
         """
         Step simulation forward by frame_skip physics timesteps with commanded targets.
-        
+
         Args:
             arm_targets: (7,) commanded arm joint positions in radians.
             gripper_target: commanded gripper actuator position (0=open, 255=closed).
-            
+            actuator_inhibit: if True, genuinely inhibits arm actuators (Safe Torque Off).
+            supervisor: Optional SafetySupervisor instance responsible for inhibition event.
+
         Returns:
             Observation dictionary.
         """
-        if arm_targets is not None:
+        if actuator_inhibit:
+            self.inhibit_arm_actuators(supervisor=supervisor)
+
+        if not self.robot.arm_actuators_inhibited and arm_targets is not None:
             self.robot.set_joint_targets(arm_targets)
+
         if gripper_target is not None:
             self.robot.set_gripper_target(gripper_target)
 
@@ -179,6 +278,7 @@ class SawmEnvironment:
                 "dist_to_object": obj_to_goal_dist,
             },
             "contacts": self.get_contacts_summary(),
+            "contact_metrics": contacts,
             "joint_limits": self.robot.check_joint_limits(),
             # Milestone 2 safety additions
             "safety": safety_telemetry,
@@ -255,9 +355,22 @@ class SawmEnvironment:
             else:
                 other_contacts.append(c)
 
+        robot_obstacle_contacts = [
+            c for c in other_contacts
+            if ((c["body1"] in robot_body_names and "static_obstacle" in c["body2"]) or
+                (c["body2"] in robot_body_names and "static_obstacle" in c["body1"]))
+        ]
+        robot_proxy_contacts = [
+            c for c in other_contacts
+            if ((c["body1"] in robot_body_names and "human_proxy" in c["body2"]) or
+                (c["body2"] in robot_body_names and "human_proxy" in c["body1"]))
+        ]
+
         return {
             "total_contacts": len(raw_contacts),
             "robot_table_collision": len(robot_table_contacts) > 0,
+            "robot_obstacle_collision": len(robot_obstacle_contacts) > 0,
+            "robot_proxy_collision": len(robot_proxy_contacts) > 0,
             "robot_object_contact": len(robot_object_contacts) > 0,
             "object_table_contact": len(object_table_contacts) > 0,
             "raw_contacts": raw_contacts,

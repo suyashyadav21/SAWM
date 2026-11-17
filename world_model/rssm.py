@@ -266,6 +266,83 @@ class RSSM(nn.Module):
             "prior_dists": prior_dists,
         }
 
+    def initial_posterior_mean(
+        self,
+        observation: torch.Tensor,
+    ) -> Tuple[torch.Tensor, torch.Tensor, Normal]:
+        """
+        Deterministic initialization of recurrent state and posterior at timestep t=0.
+        
+        Args:
+            observation: (B, 49) or (49,) Initial normalized observation vector x_0.
+            
+        Returns:
+            Tuple of:
+                - h_0: (B, 128) Zero-initialized deterministic hidden state.
+                - s_0: (B, 32) Deterministic posterior mean mu_0 = post_dist_0.mean.
+                - post_dist_0: Normal distribution object for q(s_0 | h_0, e_0).
+        """
+        is_unbatched = (observation.ndim == 1)
+        if is_unbatched:
+            observation = observation.unsqueeze(0)
+        B = observation.shape[0]
+        device = observation.device
+
+        h_0 = torch.zeros(B, self.cfg.deterministic_dim, device=device, dtype=observation.dtype)
+        e_0 = self.encoder(observation)
+        post_dist_0, _ = self.posterior(h_0, e_0)
+        s_0 = post_dist_0.mean
+
+        if is_unbatched:
+            return h_0.squeeze(0), s_0.squeeze(0), post_dist_0
+        return h_0, s_0, post_dist_0
+
+    def step_causal_mean(
+        self,
+        prev_stochastic: torch.Tensor,
+        action: torch.Tensor,
+        prev_deterministic: torch.Tensor,
+        current_observation: torch.Tensor,
+    ) -> Tuple[torch.Tensor, torch.Tensor, Normal]:
+        """
+        Deterministic causal step forward in time from t-1 to t.
+        
+        Propagates recurrent GRU transition and computes observation posterior using
+        the distribution mean (post_dist.mean) rather than stochastic rsample().
+        
+        Args:
+            prev_stochastic: (B, 32) or (32,) Previous stochastic state s_{t-1}.
+            action: (B, 8) or (8,) Executed 8-dim action a_{t-1}.
+            prev_deterministic: (B, 128) or (128,) Previous deterministic state h_{t-1}.
+            current_observation: (B, 49) or (49,) Current normalized observation x_t.
+            
+        Returns:
+            Tuple of:
+                - h_t: (B, 128) Updated deterministic hidden state.
+                - s_t: (B, 32) Deterministic posterior mean mu_t = post_dist_t.mean.
+                - post_dist_t: Normal distribution object for q(s_t | h_t, e_t).
+        """
+        is_unbatched = (prev_stochastic.ndim == 1)
+        if is_unbatched:
+            prev_stochastic = prev_stochastic.unsqueeze(0)
+            action = action.unsqueeze(0)
+            prev_deterministic = prev_deterministic.unsqueeze(0)
+            current_observation = current_observation.unsqueeze(0)
+
+        # 1. Deterministic recurrent transition
+        h_t = self.recurrent(prev_stochastic, action, prev_deterministic)
+
+        # 2. Observation encoding and posterior evaluation
+        e_t = self.encoder(current_observation)
+        post_dist_t, _ = self.posterior(h_t, e_t)
+
+        # 3. Deterministic posterior state extraction (mean)
+        s_t = post_dist_t.mean
+
+        if is_unbatched:
+            return h_t.squeeze(0), s_t.squeeze(0), post_dist_t
+        return h_t, s_t, post_dist_t
+
     def imagine(
         self,
         h_0: torch.Tensor,

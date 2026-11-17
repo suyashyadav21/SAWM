@@ -1,0 +1,412 @@
+{
+  "metadata": {
+    "timestamp": "2026-11-15T15:32:50.343388Z",
+    "device": "NVIDIA GeForce RTX 3050 Ti Laptop GPU",
+    "pytorch_version": "2.5.1+cu121",
+    "models": {
+      "rssm_checkpoint": "checkpoints/rssm_best.pt",
+      "physical_head_checkpoint": "checkpoints/physical_head_best.pt",
+      "physical_head_parameters": 31882,
+      "normalizer": "checkpoints/normalizer.pt",
+      "calibrator": "checkpoints/safety_calibrator.json",
+      "calibrated_temperature": 0.5925,
+      "calibrated_tau_coll": 0.36
+    }
+  },
+  "early_warning_audit": {
+    "criterion": "Alarm is valid strictly within horizon [max(49, t_contact - H), t_contact - 1]",
+    "evaluable_test_episodes": 5,
+    "unevaluable_test_episodes": 1,
+    "per_episode": [
+      {
+        "episode_id": 7,
+        "category": "pick_approach_collision",
+        "t_contact": 41,
+        "h10": {
+          "valid_step": null,
+          "lead_time_steps": 0,
+          "lead_time_sec": 0.0,
+          "prob": null,
+          "pred_clear_mm": null,
+          "actual_clear_mm": null,
+          "source": "miss"
+        },
+        "h50": {
+          "valid_step": null,
+          "lead_time_steps": 0,
+          "lead_time_sec": 0.0,
+          "prob": null,
+          "pred_clear_mm": null,
+          "actual_clear_mm": null,
+          "source": "miss"
+        },
+        "prob_only_first_h10_step": null,
+        "prob_only_first_h50_step": null,
+        "clear_only_first_h10_step": null,
+        "clear_only_first_h50_step": null,
+        "window_h10": [
+          49,
+          40
+        ],
+        "window_h50": [
+          49,
+          40
+        ]
+      },
+      {
+        "episode_id": 15,
+        "category": "transit_corridor_collision",
+        "t_contact": 255,
+        "h10": {
+          "valid_step": 245,
+          "lead_time_steps": 10,
+          "lead_time_sec": 0.1,
+          "prob": 0.9630320072174072,
+          "pred_clear_mm": 3.3256541937589645,
+          "actual_clear_mm": -2.3618622217327356,
+          "source": "both"
+        },
+        "h50": {
+          "valid_step": 205,
+          "lead_time_steps": 50,
+          "lead_time_sec": 0.5,
+          "prob": 0.8871954679489136,
+          "pred_clear_mm": 3.1016876455396414,
+          "actual_clear_mm": -2.3618622217327356,
+          "source": "both"
+        },
+        "prob_only_first_h10_step": 245,
+        "prob_only_first_h50_step": 205,
+        "clear_only_first_h10_step": 245,
+        "clear_only_first_h50_step": 205,
+        "window_h10": [
+          245,
+          254
+        ],
+        "window_h50": [
+          205,
+          254
+        ]
+      },
+      {
+        "episode_id": 22,
+        "category": "place_descent_collision",
+        "t_contact": 275,
+        "h10": {
+          "valid_step": 265,
+          "lead_time_steps": 10,
+          "lead_time_sec": 0.1,
+          "prob": 0.436933696269989,
+          "pred_clear_mm": 27.68750488758087,
+          "actual_clear_mm": -3.405331401154399,
+          "source": "both"
+        },
+        "h50": {
+          "valid_step": 225,
+          "lead_time_steps": 50,
+          "lead_time_sec": 0.5,
+          "prob": 0.45098966360092163,
+          "pred_clear_mm": 12.002220377326012,
+          "actual_clear_mm": -3.405331401154399,
+          "source": "both"
+        },
+        "prob_only_first_h10_step": 265,
+        "prob_only_first_h50_step": 225,
+        "clear_only_first_h10_step": 265,
+        "clear_only_first_h50_step": 225,
+        "window_h10": [
+          265,
+          274
+        ],
+        "window_h50": [
+          225,
+          274
+        ]
+      },
+      {
+        "episode_id": 23,
+        "category": "place_descent_collision",
+        "t_contact": 279,
+        "h10": {
+          "valid_step": 269,
+          "lead_time_steps": 10,
+          "lead_time_sec": 0.1,
+          "prob": 0.594614565372467,
+          "pred_clear_mm": 16.154197975993156,
+          "actual_clear_mm": -0.5983677110634744,
+          "source": "both"
+        },
+        "h50": {
+          "valid_step": 229,
+          "lead_time_steps": 50,
+          "lead_time_sec": 0.5,
+          "prob": 0.783761739730835,
+          "pred_clear_mm": 11.399602517485619,
+          "actual_clear_mm": -0.5983677110634744,
+          "source": "both"
+        },
+        "prob_only_first_h10_step": 269,
+        "prob_only_first_h50_step": 229,
+        "clear_only_first_h10_step": 269,
+        "clear_only_first_h50_step": 229,
+        "window_h10": [
+          269,
+          278
+        ],
+        "window_h50": [
+          229,
+          278
+        ]
+      },
+      {
+        "episode_id": 30,
+        "category": "dynamic_proxy_collision",
+        "t_contact": 141,
+        "h10": {
+          "valid_step": 131,
+          "lead_time_steps": 10,
+          "lead_time_sec": 0.1,
+          "prob": 0.1390770822763443,
+          "pred_clear_mm": 21.254848688840866,
+          "actual_clear_mm": -1.1537946993485093,
+          "source": "clearance"
+        },
+        "h50": {
+          "valid_step": 91,
+          "lead_time_steps": 50,
+          "lead_time_sec": 0.5,
+          "prob": 0.13338392972946167,
+          "pred_clear_mm": 51.84556543827057,
+          "actual_clear_mm": -1.1537946993485093,
+          "source": "clearance"
+        },
+        "prob_only_first_h10_step": 138,
+        "prob_only_first_h50_step": 131,
+        "clear_only_first_h10_step": 131,
+        "clear_only_first_h50_step": 91,
+        "window_h10": [
+          131,
+          140
+        ],
+        "window_h50": [
+          91,
+          140
+        ]
+      },
+      {
+        "episode_id": 31,
+        "category": "dynamic_proxy_collision",
+        "t_contact": 264,
+        "h10": {
+          "valid_step": 254,
+          "lead_time_steps": 10,
+          "lead_time_sec": 0.1,
+          "prob": 0.7191516160964966,
+          "pred_clear_mm": 6.261375732719898,
+          "actual_clear_mm": -2.565021626651287,
+          "source": "both"
+        },
+        "h50": {
+          "valid_step": 214,
+          "lead_time_steps": 50,
+          "lead_time_sec": 0.5,
+          "prob": 0.8622547388076782,
+          "pred_clear_mm": 14.200777746737003,
+          "actual_clear_mm": -2.565021626651287,
+          "source": "both"
+        },
+        "prob_only_first_h10_step": 254,
+        "prob_only_first_h50_step": 214,
+        "clear_only_first_h10_step": 254,
+        "clear_only_first_h50_step": 214,
+        "window_h10": [
+          254,
+          263
+        ],
+        "window_h50": [
+          214,
+          263
+        ]
+      }
+    ],
+    "metrics_evaluable_subset": {
+      "h10_detection_rate": 1.0,
+      "h10_mean_lead_time_steps": 10.0,
+      "h10_mean_lead_time_sec": 0.1,
+      "h50_detection_rate": 1.0,
+      "h50_mean_lead_time_steps": 50.0,
+      "h50_mean_lead_time_sec": 0.5
+    },
+    "metrics_all_colliding_episodes": {
+      "h10_detection_rate": 0.8333333333333334,
+      "h10_detection_rate_ci95": [
+        0.4365,
+        0.9699
+      ],
+      "h50_detection_rate": 0.8333333333333334,
+      "h50_detection_rate_ci95": [
+        0.4365,
+        0.9699
+      ]
+    },
+    "artifact_root_cause_analysis": {
+      "previous_report_anomaly": "Reported lead times up to 206 steps (2.06s) at H=10",
+      "mechanism_1_latched_first_alarm": "evaluate_safety_heads.py latched earliest_alarm_step_h10 at the very first step t>=49 where p>=tau or d<=0.08, subtracting it from distant t*, yielding unphysical 206-step leads.",
+      "mechanism_2_clearance_pre_activation": "audit_early_warning.py used disjunction (p >= tau or d <= 0.08). Clearance was already <= 80mm before the window, so min(alarms in [t*-H, t*-1]) trivially returned the window start t*-H.",
+      "genuine_model_forecast": "When isolating collision probability alone (p >= 0.36), accurate models cross threshold exactly at t*-H because the collision enters the lookahead sequence at index tau=H (e.g. Ep 15 jumped from p=0.349 at step 204 to p=0.887 at step 205=255-50)."
+    }
+  },
+  "forecast_indexing_verification": {
+    "conditioning_state": "s_t computed from posterior filtering on o_{t-49..t} and a_{t-49..t-1}",
+    "imagined_transitions": "tau in 1..H rolled out using actions a_{t..t+H-1}",
+    "target_alignment": "Ground truth sliced as c_haz[t+1 : t+H+1], having exactly length H",
+    "off_by_one_audit": "PASSED: Zero off-by-one errors across H1, H5, H10, H20, H50",
+    "terminal_inclusion": "PASSED: Terminal step T-1 is included in cumulative target whenever t+H >= T-1",
+    "boundary_masking": "PASSED: Horizon validity mask is strictly 0.0 for all steps where t+h > T-1"
+  },
+  "episode_7_analysis": {
+    "episode_id": 7,
+    "category": "pick_approach_collision",
+    "t_contact": 41,
+    "warmup_requirement": 50,
+    "fixed_warmup_protocol_status": "unevaluable_miss",
+    "explanation": "Under fixed 50-step warmup protocol, evaluation begins at step 49. Contact occurs at step 41, before the warmup completes. The model is never queried prior to step 49.",
+    "variable_warmup_feasibility": {
+      "data_availability": "Full observations and actions are present from step 0",
+      "replay_results": {
+        "step_15_h50": {
+          "prob": 0.364,
+          "pred_clear_mm": 50.7,
+          "lead_time_steps": 26,
+          "lead_time_sec": 0.26
+        },
+        "step_31_h10": {
+          "prob": 0.006,
+          "pred_clear_mm": 44.6,
+          "lead_time_steps": 10,
+          "lead_time_sec": 0.1
+        }
+      },
+      "recommendation": "Retain fixed warmup protocol for benchmark consistency, reporting 5/6 (83.3%) detection, but document early initialization feasibility for online M6 deployment."
+    }
+  },
+  "latency_benchmarks": {
+    "measurement_methodology": {
+      "batch_size": 1,
+      "device_sync": "torch.cuda.synchronize() before and after every measurement",
+      "warmup_iterations": 50,
+      "timed_iterations": 500,
+      "hardware": "NVIDIA GeForce RTX 3050 Ti Laptop GPU"
+    },
+    "results": {
+      "component_filter_1step": {
+        "mean": 0.7117156005697325,
+        "std": 0.18229224164647345,
+        "median": 0.6552499835379422,
+        "p95": 1.065335009479894,
+        "p99": 1.4799020040663888,
+        "min": 0.5447999865282327,
+        "max": 1.7854000034276396
+      },
+      "component_imagine_10_nodecode": {
+        "mean": 5.162730800919235,
+        "std": 0.5567162509830582,
+        "median": 5.077099995105527,
+        "p95": 6.110379987512715,
+        "p99": 7.283352986851241,
+        "min": 4.282599984435365,
+        "max": 9.595599985914305
+      },
+      "component_imagine_50_nodecode": {
+        "mean": 25.541636000096332,
+        "std": 1.972446115376457,
+        "median": 25.43459998560138,
+        "p95": 28.28132000140613,
+        "p99": 29.894095990748607,
+        "min": 21.776100009446964,
+        "max": 50.145599991083145
+      },
+      "component_imagine_decode_10": {
+        "mean": 5.713149200659245,
+        "std": 0.918697625712688,
+        "median": 5.536950004170649,
+        "p95": 7.401415005733724,
+        "p99": 9.667408001259897,
+        "min": 4.478299990296364,
+        "max": 11.489399999845773
+      },
+      "component_imagine_decode_50": {
+        "mean": 26.699083000596147,
+        "std": 3.043284640418367,
+        "median": 26.421500006108545,
+        "p95": 31.29334500408731,
+        "p99": 39.264116013364394,
+        "min": 21.141899982467294,
+        "max": 57.72020001313649
+      },
+      "component_physical_head": {
+        "mean": 0.7490654005086981,
+        "std": 0.14773548796341798,
+        "median": 0.7208499882835895,
+        "p95": 0.98412498482503,
+        "p99": 1.37748199776979,
+        "min": 0.5821999802719802,
+        "max": 1.8199000041931868
+      },
+      "component_contextual_head_10": {
+        "mean": 1.1409329992020503,
+        "std": 0.1687952277511297,
+        "median": 1.111499994294718,
+        "p95": 1.4810750144533813,
+        "p99": 1.6826000055880286,
+        "min": 0.912799994694069,
+        "max": 1.9657000084407628
+      },
+      "component_contextual_head_50": {
+        "mean": 5.479617000091821,
+        "std": 0.5591568940023328,
+        "median": 5.398799999966286,
+        "p95": 6.502739978895988,
+        "p99": 6.970266987918876,
+        "min": 4.535899992333725,
+        "max": 7.357199996476993
+      },
+      "end_to_end_pipeline_h10": {
+        "mean": 9.419226999336388,
+        "std": 1.0701581442303587,
+        "median": 9.165550000034273,
+        "p95": 11.707949974515941,
+        "p99": 12.479763995797839,
+        "min": 7.542699982877821,
+        "max": 14.070100005483255
+      },
+      "end_to_end_pipeline_h50": {
+        "mean": 34.30964100029087,
+        "std": 2.372418357032824,
+        "median": 34.27720001491252,
+        "p95": 37.99684500118019,
+        "p99": 40.40009501099121,
+        "min": 28.929499996593222,
+        "max": 42.75059999781661
+      }
+    },
+    "compliance_assessment": {
+      "h10_end_to_end": {
+        "mean_ms": 9.419226999336388,
+        "median_ms": 9.165550000034273,
+        "p95_ms": 11.707949974515941,
+        "p99_ms": 12.479763995797839,
+        "compliant_100hz": false,
+        "note": "Mean (9.42ms) and median (9.17ms) are below 10ms, but p95 (11.71ms) exceeds 10ms budget. Borderline at 100Hz; fully compliant at 50Hz (20ms budget)."
+      },
+      "h50_end_to_end": {
+        "mean_ms": 34.30964100029087,
+        "median_ms": 34.27720001491252,
+        "p95_ms": 37.99684500118019,
+        "p99_ms": 40.40009501099121,
+        "compliant_100hz": false,
+        "note": "Mean (34.31ms) and median (34.28ms) exceed 10ms budget. Must execute at <= 25Hz or asynchronously."
+      }
+    }
+  }
+}

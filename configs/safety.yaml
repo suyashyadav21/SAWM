@@ -89,3 +89,25 @@ scenarios:
     static_obstacle_pos: [0.45, 0.00, 0.51] # In line with gripper descent
     enable_human_proxy: false
     enable_restricted_zone: false
+
+# ==============================================================================
+# Milestone 5: Predictive Safety System Configuration
+# ==============================================================================
+predictive:
+  horizons: [1, 5, 10, 20, 50]
+  time_steps: [0.01, 0.05, 0.10, 0.20, 0.50]   # seconds
+  default_eval_horizon: 10
+  collision_threshold: 0.50                    # Default tau_coll before calibration
+  temperature: 1.0                             # Default scaling temperature
+  danger_distance: 0.08                        # meters
+  warning_distance: 0.20                       # meters
+  background_distance: 0.50                    # meters
+  contextual:
+    zone_margin: 0.02                          # meters
+    zone_warning_buffer: 0.05                  # meters
+    manip_corridor_radius: 0.08                # meters
+    table_z_surface: 0.400                     # meters
+    table_warning_z: 0.430                     # meters
+    table_danger_z: 0.402                      # meters
+    reach_warning_radius: 0.820                # meters
+    reach_danger_radius: 0.850                 # meters

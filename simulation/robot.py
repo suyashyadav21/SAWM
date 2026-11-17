@@ -12,7 +12,7 @@ Encapsulates:
 
 import numpy as np
 import mujoco
-from typing import Dict, List, Tuple, Optional
+from typing import Dict, List, Tuple, Optional, Any
 
 
 class FrankaPandaRobot:
@@ -57,6 +57,12 @@ class FrankaPandaRobot:
             float(model.actuator_ctrlrange[self.gripper_actuator_id][1])
         )
 
+        # Store original actuator limits and gains for arm actuators (for inhibition / STO)
+        self._orig_actuator_forcerange = model.actuator_forcerange[self.actuator_ids].copy()
+        self._orig_actuator_gainprm = model.actuator_gainprm[self.actuator_ids].copy()
+        self._orig_actuator_biasprm = model.actuator_biasprm[self.actuator_ids].copy()
+        self.arm_actuators_inhibited: bool = False
+
     # -------------------------------------------------------------------------
     # State Inspection
     # -------------------------------------------------------------------------
@@ -94,6 +100,54 @@ class FrankaPandaRobot:
     # -------------------------------------------------------------------------
     # Control Interface
     # -------------------------------------------------------------------------
+    def inhibit_arm_actuators(self) -> None:
+        """
+        Genuinely inhibit arm actuators (simulation-only model of Safe Torque Off).
+        LATCHED: Sets force ranges, gains, and bias terms of the 7 arm actuators to zero,
+        ensuring actuators generate identically 0.0 torque regardless of ctrl buffer values.
+        Inhibition persists across subsequent step calls until explicitly enabled via enable_arm_actuators().
+
+        NOTE: Simulation-only mechanism. In physical hardware, zero actuator torque causes the arm
+        to move under gravity unless mechanical holding brakes are engaged; zero torque does not
+        guarantee a physically safe robot posture.
+        """
+        self.arm_actuators_inhibited = True
+        self.model.actuator_forcerange[self.actuator_ids] = 0.0
+        self.model.actuator_gainprm[self.actuator_ids] = 0.0
+        self.model.actuator_biasprm[self.actuator_ids] = 0.0
+
+    def _restore_arm_actuators(self) -> None:
+        """
+        Internal low-level actuator parameter restoration.
+        Private to simulation infrastructure. Must ONLY be invoked by
+        SawmEnvironment.authorize_actuator_recovery() after validating a
+        genuine SafetySupervisor instance.
+
+        NOTE: Simulation-level recovery authorization mechanism, not a security boundary
+        against arbitrary Python code execution.
+        """
+        if self.arm_actuators_inhibited:
+            self.arm_actuators_inhibited = False
+            self.model.actuator_forcerange[self.actuator_ids] = self._orig_actuator_forcerange.copy()
+            self.model.actuator_gainprm[self.actuator_ids] = self._orig_actuator_gainprm.copy()
+            self.model.actuator_biasprm[self.actuator_ids] = self._orig_actuator_biasprm.copy()
+
+    def enable_arm_actuators(self, *args: Any, **kwargs: Any) -> None:
+        """
+        PROHIBITED: Direct actuator restoration via PandaRobot is prohibited.
+        Actuator recovery must be routed exclusively through
+        SawmEnvironment.authorize_actuator_recovery(supervisor) with a genuine
+        SafetySupervisor instance.
+
+        NOTE: Simulation-level recovery authorization mechanism, not a security boundary
+        against arbitrary Python code execution.
+        """
+        raise RuntimeError(
+            "Direct actuator restoration via robot.enable_arm_actuators() is prohibited. "
+            "Actuator recovery must be routed exclusively through "
+            "SawmEnvironment.authorize_actuator_recovery(supervisor) with a genuine SafetySupervisor."
+        )
+
     def set_joint_targets(self, targets: np.ndarray, clip_to_limits: bool = True) -> None:
         """
         Set target positions for the 7 arm actuators.
@@ -102,6 +156,8 @@ class FrankaPandaRobot:
             targets: Array of 7 target angles in radians.
             clip_to_limits: If True, clips commanded targets within joint limits.
         """
+        if self.arm_actuators_inhibited:
+            return  # Inhibit targets while arm actuators are inhibited
         assert len(targets) == 7, f"Expected 7 joint targets, got {len(targets)}"
         for i, act_id in enumerate(self.actuator_ids):
             val = float(targets[i])
