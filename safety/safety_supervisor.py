@@ -118,14 +118,51 @@ class TacticalTelemetry:
     timestamp: float = 0.0             # Timestamp of generation
     age_ms: float = 0.0                # Age relative to evaluation tick
 
-    def validate(self) -> Tuple[bool, List[str]]:
-        """Validate telemetry values, ranges, and finiteness."""
+    def validate(self, current_time: Optional[float] = None) -> Tuple[bool, List[str]]:
+        """Validate telemetry values, ranges, clock finiteness, and computed age."""
         errors = []
+
+        # 1. Validate current_time if provided
+        if current_time is not None:
+            if not isinstance(current_time, (int, float, np.floating)):
+                errors.append(f"Invalid current_time type: {type(current_time)}, expected float")
+            elif np.isnan(current_time):
+                errors.append("Invalid current_time: current_time is NaN")
+            elif np.isinf(current_time):
+                errors.append(f"Invalid current_time: current_time is infinite ({current_time})")
+
+        # 2. Validate timestamp
+        if self.timestamp is None:
+            errors.append("Missing timestamp: timestamp cannot be None")
+        elif not isinstance(self.timestamp, (int, float, np.floating)):
+            errors.append(f"Invalid timestamp type: {type(self.timestamp)}, expected float")
+        elif np.isnan(self.timestamp):
+            errors.append("Non-finite value in timestamp: NaN")
+        elif np.isinf(self.timestamp):
+            errors.append(f"Non-finite value in timestamp: {self.timestamp}")
+
+        # 3. Compute and validate relative age
+        if current_time is not None and len(errors) == 0:
+            try:
+                raw_age = float(current_time) - float(self.timestamp)
+                computed_age_ms = raw_age * 1000.0
+                if not np.isfinite(computed_age_ms):
+                    errors.append(f"Non-finite or overflowed computed age: {computed_age_ms}")
+                elif computed_age_ms < 0.0:
+                    errors.append(f"age_ms cannot be negative: {computed_age_ms:.4f} ms")
+                else:
+                    self.age_ms = computed_age_ms
+            except OverflowError as oe:
+                errors.append(f"Arithmetic overflow during age computation: {oe}")
+
+        # 4. Validate remaining payload fields
         for name, val in [("p10", self.p10), ("d10_clear", self.d10_clear),
                           ("c_harm", self.c_harm), ("closure_rate", self.closure_rate),
                           ("human_proxy_distance", self.human_proxy_distance),
-                          ("timestamp", self.timestamp), ("age_ms", self.age_ms)]:
-            if np.isnan(val) or np.isinf(val):
+                          ("age_ms", self.age_ms)]:
+            if val is None or not isinstance(val, (int, float, np.floating)):
+                errors.append(f"Invalid or non-numeric value in {name}: {val}")
+            elif np.isnan(val) or np.isinf(val):
                 errors.append(f"Non-finite value in {name}: {val}")
         if not (0.0 <= self.p10 <= 1.0):
             errors.append(f"p10 out of valid probability range [0, 1]: {self.p10}")
@@ -149,12 +186,49 @@ class StrategicTelemetry:
     age_ms: float = 0.0                # Age relative to evaluation tick
     is_stale: bool = False             # True if age > 150 ms
 
-    def validate(self) -> Tuple[bool, List[str]]:
-        """Validate strategic telemetry values and ranges."""
+    def validate(self, current_time: Optional[float] = None) -> Tuple[bool, List[str]]:
+        """Validate strategic telemetry values, clock finiteness, and ranges."""
         errors = []
+
+        # 1. Validate current_time if provided
+        if current_time is not None:
+            if not isinstance(current_time, (int, float, np.floating)):
+                errors.append(f"Invalid current_time type: {type(current_time)}, expected float")
+            elif np.isnan(current_time):
+                errors.append("Invalid current_time: current_time is NaN")
+            elif np.isinf(current_time):
+                errors.append(f"Invalid current_time: current_time is infinite ({current_time})")
+
+        # 2. Validate timestamp
+        if self.timestamp is None:
+            errors.append("Missing timestamp: timestamp cannot be None")
+        elif not isinstance(self.timestamp, (int, float, np.floating)):
+            errors.append(f"Invalid timestamp type: {type(self.timestamp)}, expected float")
+        elif np.isnan(self.timestamp):
+            errors.append("Non-finite value in timestamp: NaN")
+        elif np.isinf(self.timestamp):
+            errors.append(f"Non-finite value in timestamp: {self.timestamp}")
+
+        # 3. Compute and validate relative age
+        if current_time is not None and len(errors) == 0:
+            try:
+                raw_age = float(current_time) - float(self.timestamp)
+                computed_age_ms = raw_age * 1000.0
+                if not np.isfinite(computed_age_ms):
+                    errors.append(f"Non-finite or overflowed computed age: {computed_age_ms}")
+                elif computed_age_ms < 0.0:
+                    errors.append(f"age_ms cannot be negative: {computed_age_ms:.4f} ms")
+                else:
+                    self.age_ms = computed_age_ms
+            except OverflowError as oe:
+                errors.append(f"Arithmetic overflow during age computation: {oe}")
+
+        # 4. Validate remaining payload fields
         for name, val in [("p50", self.p50), ("d50_clear", self.d50_clear),
-                          ("timestamp", self.timestamp), ("age_ms", self.age_ms)]:
-            if np.isnan(val) or np.isinf(val):
+                          ("age_ms", self.age_ms)]:
+            if val is None or not isinstance(val, (int, float, np.floating)):
+                errors.append(f"Invalid or non-numeric value in {name}: {val}")
+            elif np.isnan(val) or np.isinf(val):
                 errors.append(f"Non-finite value in {name}: {val}")
         if not (0.0 <= self.p50 <= 1.0):
             errors.append(f"p50 out of valid range [0, 1]: {self.p50}")
@@ -245,6 +319,13 @@ class SafetySupervisor:
 
     def __init__(self, config: Optional[dict] = None):
         self.config = config or {}
+
+        # Freshness boundaries (configurable with class defaults)
+        self.h10_fresh_max_ms: float = float(self.config.get("h10_fresh_max_ms", self.H10_FRESH_MAX_MS))
+        self.h10_stale_max_ms: float = float(self.config.get("h10_stale_max_ms", self.H10_STALE_MAX_MS))
+        self.h50_fresh_max_ms: float = float(self.config.get("h50_fresh_max_ms", self.H50_FRESH_MAX_MS))
+        self.h50_stale_max_ms: float = float(self.config.get("h50_stale_max_ms", self.H50_STALE_MAX_MS))
+        self.require_h50: bool = bool(self.config.get("require_h50", True))
 
         # FSM state
         self._state: SupervisorState = SupervisorState.NORMAL
@@ -535,7 +616,8 @@ class SafetySupervisor:
     # -------------------------------------------------------------------------
     def evaluate_tactical_alarms(
         self,
-        tactical: Optional[TacticalTelemetry]
+        tactical: Optional[TacticalTelemetry],
+        current_time: Optional[float] = None,
     ) -> Tuple[bool, bool, bool, bool, List[str]]:
         """
         Evaluate Tactical Alarms according to Section 3 & 5 of M6 Specification:
@@ -560,15 +642,16 @@ class SafetySupervisor:
             alarms.append("TACTICAL_TELEMETRY_MISSING: Missing H10 telemetry forces conservative response")
             return False, False, False, False, alarms
 
-        valid, val_errs = tactical.validate()
+        valid, val_errs = tactical.validate(current_time=current_time)
         if not valid:
             for err in val_errs:
                 alarms.append(f"CRITICAL_TELEMETRY_INVALID: {err}")
             return True, True, False, False, alarms
 
         # Check for expired H10
-        if tactical.age_ms > self.H10_STALE_MAX_MS:
-            alarms.append(f"TACTICAL_TELEMETRY_EXPIRED: age={tactical.age_ms:.1f}ms > {self.H10_STALE_MAX_MS}ms")
+        stale_limit = getattr(self, "h10_stale_max_ms", self.H10_STALE_MAX_MS)
+        if tactical.age_ms > stale_limit:
+            alarms.append(f"TACTICAL_TELEMETRY_EXPIRED: age={tactical.age_ms:.1f}ms > {stale_limit}ms")
 
         p10 = tactical.p10
         d10 = tactical.d10_clear
@@ -777,6 +860,7 @@ class SafetySupervisor:
         planner_stage: str = "MOVE_TO_TARGET",
         gravity_torques: Optional[np.ndarray] = None,
         dt: float = 0.01,
+        current_time: Optional[float] = None,
     ) -> InterventionCommand:
         """
         Execute one 100 Hz supervisor evaluation tick.
@@ -1019,7 +1103,9 @@ class SafetySupervisor:
         max_vel = np.max(np.abs(q_vel[:7]))
 
         # Evaluate tactical alarms
-        severe_emergency, crit_fast_path, phys_mod_confirmed, ctx_mod_confirmed, tactical_alarms = self.evaluate_tactical_alarms(tactical)
+        severe_emergency, crit_fast_path, phys_mod_confirmed, ctx_mod_confirmed, tactical_alarms = self.evaluate_tactical_alarms(
+            tactical, current_time=current_time
+        )
         self._active_alarms.extend(tactical_alarms)
 
         # ---------------------------------------------------------------------
@@ -1134,45 +1220,49 @@ class SafetySupervisor:
                     self._stop_mode = StopMode.CONTROLLED_DECEL
                     self._recovery_dwell_counter = 0
                     self._active_alarms.append("TRANSITION: NORMAL -> SLOWDOWN (Moderate Physical Risk Confirmed)")
-                elif tactical.age_ms > self.H10_STALE_MAX_MS:
+                elif tactical.age_ms > self.h10_stale_max_ms:
                     self._state = SupervisorState.SLOWDOWN
                     self._stop_mode = StopMode.CONTROLLED_DECEL
                     self._recovery_dwell_counter = 0
-                    self._active_alarms.append("TRANSITION: NORMAL -> SLOWDOWN (Tactical Telemetry Expired > 80ms)")
+                    self._active_alarms.append(f"TRANSITION: NORMAL -> SLOWDOWN (Tactical Telemetry Expired > {self.h10_stale_max_ms:.0f}ms)")
                 # Caution triggers: contextual warning, strategic conflict, or stale telemetry
                 elif (
                     ctx_mod_confirmed
                     or (self.D10_MODERATE_THRESHOLD < tactical.d10_clear <= self.D10_CAUTION_THRESHOLD)
                     or (strategic is not None and strategic.p50 >= self.P50_STRATEGIC_THRESHOLD)
-                    or (self.H10_FRESH_MAX_MS < tactical.age_ms <= self.H10_STALE_MAX_MS)
-                    or (strategic is None)
-                    or (strategic is not None and (strategic.is_stale or strategic.age_ms > self.H50_FRESH_MAX_MS))
+                    or (self.h10_fresh_max_ms < tactical.age_ms <= self.h10_stale_max_ms)
+                    or (self.require_h50 and strategic is None)
+                    or (strategic is not None and (strategic.is_stale or strategic.age_ms > self.h50_fresh_max_ms))
                 ):
                     self._state = SupervisorState.CAUTION
                     self._stop_mode = StopMode.NONE
                     self._active_alarms.append("TRANSITION: NORMAL -> CAUTION")
 
             elif self._state == SupervisorState.CAUTION:
+                strat_conflict = (strategic is not None and (strategic.p50 >= self.P50_STRATEGIC_THRESHOLD or strategic.d50_clear <= self.D10_MODERATE_THRESHOLD))
                 if (tactical is None
                     or crit_fast_path
                     or phys_mod_confirmed
-                    or tactical.age_ms > self.H10_STALE_MAX_MS):
+                    or strat_conflict
+                    or tactical.age_ms > self.h10_stale_max_ms):
                     self._state = SupervisorState.SLOWDOWN
                     self._stop_mode = StopMode.CONTROLLED_DECEL
                     self._recovery_dwell_counter = 0
                     self._active_alarms.append("TRANSITION: CAUTION -> SLOWDOWN")
-                # De-escalation to NORMAL requires BOTH fresh H10 and fresh H50
+                # De-escalation to NORMAL requires BOTH fresh H10 and fresh H50 (if require_h50 enabled)
                 elif (
                     tactical is not None
                     and tactical.d10_clear >= self.D10_RECOVERY_CLEARANCE
                     and tactical.p10 <= self.P10_RECOVERY_THRESHOLD
                     and tactical.c_harm < self.C_HARM_MODERATE_THRESHOLD
-                    and tactical.age_ms <= self.H10_FRESH_MAX_MS
-                    and strategic is not None
-                    and not strategic.is_stale
-                    and strategic.age_ms <= self.H50_FRESH_MAX_MS
-                    and strategic.p50 <= self.P50_RECOVERY_THRESHOLD
-                    and strategic.d50_clear >= self.D50_RECOVERY_THRESHOLD
+                    and tactical.age_ms <= self.h10_fresh_max_ms
+                    and (not self.require_h50 or (
+                        strategic is not None
+                        and not strategic.is_stale
+                        and strategic.age_ms <= self.h50_fresh_max_ms
+                        and strategic.p50 <= self.P50_RECOVERY_THRESHOLD
+                        and strategic.d50_clear >= self.D50_RECOVERY_THRESHOLD
+                    ))
                 ):
                     self._clear_path_dwell_counter += 1
                     if self._clear_path_dwell_counter >= 10:
@@ -1232,9 +1322,9 @@ class SafetySupervisor:
             self._stop_mode = StopMode.NONE
 
         elif self._state == SupervisorState.CAUTION:
-            if tactical is not None and self.H10_FRESH_MAX_MS < tactical.age_ms <= self.H10_STALE_MAX_MS:
+            if tactical is not None and self.h10_fresh_max_ms < tactical.age_ms <= self.h10_stale_max_ms:
                 self._speed_scale = 0.50
-            elif strategic is None or strategic.is_stale or strategic.age_ms > self.H50_FRESH_MAX_MS:
+            elif strategic is None or strategic.is_stale or strategic.age_ms > self.h50_fresh_max_ms:
                 self._speed_scale = 0.80
             else:
                 self._speed_scale = 0.60

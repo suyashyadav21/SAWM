@@ -1,0 +1,32 @@
+{
+  "scenario_a": {
+    "scenario": "A_NORMAL",
+    "task_success": true,
+    "placement_error_mm": 1.50425508852673,
+    "total_steps": 510,
+    "peak_p10": 0.03141967952251434,
+    "min_d10_m": 0.8631293177604675,
+    "non_normal_interventions": 0,
+    "final_supervisor_state": "NORMAL",
+    "elapsed_wall_seconds": 15.793926477432251
+  },
+  "scenario_b": {
+    "scenario": "B_PREDICTIVE_HAZARD",
+    "intervention_step": 27,
+    "intervention_cursor": 27.0,
+    "intervention_stage": "MOVE_TO_PREGRASP",
+    "intervention_state": "CAUTION",
+    "intervention_p10": 0.11949009448289871,
+    "intervention_p50": 0.42108458280563354,
+    "intervention_d10_m": 0.8749520778656006,
+    "intervention_geom_dist_m": 0.45773985848703325,
+    "slowdown_step": 28,
+    "stopped_step": 98,
+    "stopped_cursor": 36.3,
+    "geom_dist_at_stop_mm": 161.3099069764148,
+    "min_clearance_at_rest_mm": 104.41168599106587,
+    "layer0_collision_occurred": false,
+    "collision_step": null,
+    "elapsed_wall_seconds": 4.408536911010742
+  }
+}
